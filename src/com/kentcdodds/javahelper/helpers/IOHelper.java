@@ -57,25 +57,25 @@ public class IOHelper {
   }
 
   /**
-  * Takes the file and returns it in a string
-  *
-  * @param location
-  * @return
-  * @throws IOException
-  */
+   * Takes the file and returns it in a string
+   *
+   * @param location
+   * @return
+   * @throws IOException
+   */
   public static String fileToString(String location) throws IOException {
     FileReader fr = new FileReader(new File(location));
     return readerToString(fr);
   }
 
   /**
-  * Takes the given resource (based on the given class) and returns that as a string.
-  *
-  * @param location
-  * @param c
-  * @return
-  * @throws IOException
-  */
+   * Takes the given resource (based on the given class) and returns that as a string.
+   *
+   * @param location
+   * @param c
+   * @return
+   * @throws IOException
+   */
   public static String resourceToString(String location, Class c) throws IOException {
     InputStream is = c.getResourceAsStream(location);
     InputStreamReader r = new InputStreamReader(is);
@@ -83,12 +83,12 @@ public class IOHelper {
   }
 
   /**
-  * Returns all the lines in the scanner's stream as a String
-  *
-  * @param r
-  * @return
-  * @throws IOException
-  */
+   * Returns all the lines in the scanner's stream as a String
+   *
+   * @param r
+   * @return
+   * @throws IOException
+   */
   public static String readerToString(InputStreamReader r) throws IOException {
     StringWriter sw = new StringWriter();
     char[] buf = new char[1024];
@@ -156,10 +156,148 @@ public class IOHelper {
    * @throws MalformedURLException
    * @throws IOException
    */
-  public synchronized static BufferedReader getBufferedReader(String urlString) throws MalformedURLException, IOException {
+  public static BufferedReader getBufferedReader(String urlString) throws MalformedURLException, IOException {
     URL url = new URL(urlString);
     InputStream is = url.openStream();
     BufferedReader br = new BufferedReader(new InputStreamReader(is, "UTF-8"));
     return br;
+  }
+
+  /**
+   * Replaces the given find with the given replace in the given file. Reads the file to a string, replaces
+   * the find with the replace in the string and prints the new string on top of the original file.
+   *
+   * @param file the file to conduct the find/replace on
+   * @param find the find to replace
+   * @param replace the text to replace the find with
+   * @return whether anything was different in the replace call. It does not print over the original file if
+   * nothing is different
+   * @throws IOException
+   */
+  public static boolean replaceInFile(File file, String find, String replace) throws IOException {
+    String fileString = fileToString(file.getPath());
+    String newString = fileString.replace(find, replace);
+    if (fileString.equals(newString)) {
+      return false;
+    }
+    print(file, newString);
+    return true;
+  }
+
+  /**
+   * Replaces the given find with the given replace in all the files under the given directory of the given
+   * file extension(s). If the file extension is null (or omitted), it will ignore the file extension and
+   * apply to all files regardless of their extension. Calls replaceInFile(file, find, replace) on each of the
+   * files. Skips any files which throw IO exceptions and adds it to the list which is returned
+   *
+   * @param topDirectory the topDirectory to find the files in
+   * @param sublevels determines how many subdirectories to go before it stops adding files. Give 0 to get
+   * files only in the given directory
+   * @param find the text to be replaced by the given replace
+   * @param replace the text to replace the given find with
+   * @param extension the any-number of extensions to apply the find/replace to. Omit for any type
+   * @return An array of Lists of Files: arry[0] = files which applied and were successful in the find/replace
+   * operation; arry[1] = files which may have been successful, but there would have been no change to the
+   * file during the find/replace operation so the file was not overwritten; arry[2] = files which threw an
+   * IOException for any reason.
+   */
+  public static java.util.List<File>[] replaceInAllFiles(File topDirectory, int sublevels, String find, String replace, String... extension) {
+    java.util.List<File> files = getAllFiles(topDirectory, sublevels, extension);
+    java.util.List<File> appliedFiles = new java.util.ArrayList<>();
+    java.util.List<File> errorFiles = new java.util.ArrayList<>();
+    java.util.List<File> unappliedFiles = new java.util.ArrayList<>();
+    for (File file : files) {
+      try {
+        boolean applied = replaceInFile(file, find, replace);
+        if (applied) {
+          appliedFiles.add(file);
+        } else {
+          unappliedFiles.add(file);
+        }
+      } catch (IOException ex) {
+        errorFiles.add(file);
+        Logger.getLogger(IOHelper.class.getName()).log(Level.SEVERE, null, ex);
+      }
+    }
+    return new java.util.List[]{appliedFiles, unappliedFiles, errorFiles};
+  }
+
+  /**
+   * Gets all the files under the given file (not including the given file).
+   *
+   * @param file the file to get files under
+   * @param sublevels determines how many subdirectories to go before it stops adding files. Give 0 to get
+   * files only in the given directory (or just call getDirectoryFiles(file, extension) instead).
+   * @param extension the extension(s) to add to the returned list. If null or omitted will add all files to
+   * the returned list (not including directories)
+   * @return
+   */
+  public static java.util.List<File> getAllFiles(File file, int sublevels, String... extension) {
+    java.util.List<File> filesList = new java.util.ArrayList<>();
+    if (sublevels < -1) {
+      return filesList; //Important it doesn't return null.
+    }
+    if (file.isDirectory()) {
+      File[] listFiles = file.listFiles();
+      if (listFiles != null) {
+        for (File file1 : listFiles) {
+          filesList.addAll(getAllFiles(file1, sublevels - 1, extension));
+        }
+      }
+    } else if (file.isFile()) {
+      if (extension == null || extension.length == 0) {
+        filesList.add(file);
+      } else {
+        for (String string : extension) {
+          if (file.getName().endsWith(string)) {
+            filesList.add(file);
+          }
+        }
+      }
+    }
+    return filesList;
+  }
+
+  /**
+   * Gets files in the given directory.
+   *
+   * @param directory the directory to search for files in.
+   * @param extension the text the file should end with to be added to the returned list
+   * @return a list of the files in the directory
+   */
+  public static java.util.List<File> getDirectoryFiles(File directory, String... extension) {
+    File[] listFiles = directory.listFiles();
+    java.util.List<File> filesList = new java.util.ArrayList<>();
+    for (File file : listFiles) {
+      if (file.isFile()) {
+        if (extension == null || extension.length == 0) {
+          filesList.add(file);
+        } else {
+          for (String ext : extension) {
+            if (file.getName().endsWith(ext)) {
+              filesList.add(file);
+            }
+          }
+        }
+      }
+    }
+    return filesList;
+  }
+
+  /**
+   * Gets directories in the given directory.
+   *
+   * @param directory the directory to search for files in.
+   * @return a list of the files in the directory
+   */
+  public static java.util.List<File> getDirectoryDirectories(File directory) {
+    File[] listFiles = directory.listFiles();
+    java.util.List<File> filesList = new java.util.ArrayList<>();
+    for (File file : listFiles) {
+      if (file.isDirectory()) {
+        filesList.add(file);
+      }
+    }
+    return filesList;
   }
 }
