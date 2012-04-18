@@ -300,4 +300,31 @@ public class IOHelper {
     }
     return filesList;
   }
+
+  /**
+   * Saves the given object to the given destination
+   *
+   * @param object
+   * @param savePath
+   * @throws IOException
+   */
+  public static void saveObject(Object object, String savePath) throws IOException {
+    FileOutputStream f_out = new FileOutputStream(savePath);
+    ObjectOutputStream o_out = new ObjectOutputStream(f_out);
+    o_out.writeObject(object);
+  }
+
+  /**
+   * Opens an object from the given openPath and returns it
+   *
+   * @param openPath
+   * @return
+   * @throws IOException
+   * @throws ClassNotFoundException
+   */
+  public static Object loadObject(String openPath) throws IOException, ClassNotFoundException {
+    FileInputStream f_in = new FileInputStream(openPath);
+    ObjectInputStream o_in = new ObjectInputStream(f_in);
+    return o_in.readObject();
+  }
 }

@@ -1,11 +1,10 @@
 package com.kentcdodds.javahelper.test;
 
-import com.kentcdodds.javahelper.helpers.DateHelper;
-import com.kentcdodds.javahelper.helpers.OtherHelper;
-import com.kentcdodds.javahelper.helpers.StringHelper;
+import com.kentcdodds.javahelper.helpers.*;
 import java.io.File;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 /**
  *
@@ -14,6 +13,45 @@ import java.util.Date;
 public class TestClass {
 
   public static void main(String[] args) throws Exception {
+    SwingHelper.setSystemLookAndFeel();
+    PrinterHelper.setInstancePrint(true);
+    for (int i = 0; i < 10; i++) {
+      PrinterHelper.print("Hi!");
+      PrinterHelper.printErr("Err!");
+    }
+    PrinterHelper.showMessageConsole("Output info");
+    for (int i = 0; i < 300; i++) {
+      Thread.currentThread().sleep(200);
+      PrinterHelper.print("Hi! - 2");
+      PrinterHelper.printErr("Err! - 2");
+    }
+    Thread.currentThread().sleep(1000);
+    PrinterHelper.showMessageConsole();
+    for (int i = 0; i < 10; i++) {
+      Thread.currentThread().sleep(500);
+      PrinterHelper.print("Hi! - 3");
+      PrinterHelper.printErr("Err! - 3");
+    }
+    System.exit(0);
+    //    List<File>[] replaced = IOHelper.replaceInAllFiles(new File("C:\\Users\\Kent\\Documents\\My Dropbox\\Work\\MGF\\NetBeansProjects\\MGFEncode\\src"), 5, "System.out", "System.out");
+    //    List<File> appliedFiles = replaced[0];
+    //    List<File> unappliedFiles = replaced[1];
+    //    List<File> errorFiles = replaced[2];
+    //    System.out.println("Applied files");
+    //    for (File file : appliedFiles) {
+    //      System.out.println(file);
+    //    }
+    //    System.out.println("Total Applied Files: " + appliedFiles.size());
+    //    System.out.println("Unapplied files");
+    //    for (File file : unappliedFiles) {
+    //      System.out.println(file);
+    //    }
+    //    System.out.println("Total Unapplied Files: " + unappliedFiles.size());
+    //    System.out.println("Error files");
+    //    for (File file : errorFiles) {
+    //      System.out.println(file);
+    //    }
+    //    System.out.println("Total Error Files: " + errorFiles.size());
   }
 
   public static void dateHelper() {
