@@ -8,7 +8,7 @@ public class StringFormatHelper {
 
   /**
    * Exact code: String fixedNumber = cleanNumber(number).replace(".", ""); return
-   * insertIntoString(fixedNumber, char0, "", "", char3, "", "", char6);
+   * StringHelper.insertIntoString(fixedNumber, char0, "", "", char3, "", "", char6);
    *
    * @param number
    * @param char0
@@ -22,9 +22,9 @@ public class StringFormatHelper {
   }
 
   /**
-   * Calls cleanPhoneNumber(number).replace("."); and then formats a number to look like this: (555) 123-4567.
-   * Note: If you give too many numbers they'll just be added to the end of the number. Like this (555)
-   * 123-456789101112
+   * Returns: formatPhoneNumber(number, "(", ") ", "-") which formats a number to look like this: (555)
+   * 123-4567. Note: If you give too many numbers they'll just be added to the end of the number. Like this
+   * (555) 123-456789101112
    *
    * @param number
    * @return formatted phone number
@@ -37,7 +37,7 @@ public class StringFormatHelper {
    * If the call was formatCreditCard("1234567812345678", "-") the result would be: 1234-5678-1234-5678. This
    * will continue if you give too long or too short of a number. If you give 12345, the result will be:
    * 1234-5. If you give 12345678123456789, it will return 1234-5678-1234-5678-9. NOTE: Also first calls
-   * cleanNumber(creditCard).replace(".", "");
+   * NumberHelper.cleanNumber(creditCard).replace(".", "");
    *
    * @param creditCard the number string to format like a credit card number
    * @param separator the item to put between every 4 numbers
