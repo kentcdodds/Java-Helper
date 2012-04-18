@@ -11,6 +11,9 @@ import org.psafix.folderchooser.JFolderChooser;
  */
 public class SwingHelper {
 
+  /**
+   * The number of characters used when wordWrappedMessage(String message) is called. Defaults to 50
+   */
   private static int wordWrapChars = 50;
 
   /**
@@ -232,8 +235,8 @@ public class SwingHelper {
   }
 
   /**
-   * Convenience Method: Calls StringHelper.wordWrappedMessage(message, getWordWrapChars()). A method like this allows you to
-   * keep everything standard for JOptionPane messages
+   * Convenience Method: Calls StringHelper.wordWrappedMessage(message, getWordWrapChars()). A method like
+   * this allows you to keep everything standard for JOptionPane messages
    *
    * @param message
    * @return
@@ -243,25 +246,28 @@ public class SwingHelper {
   }
 
   /**
-   * Shows an error message with the given message
+   * Shows an error message with the given message. Calls wordWrappedMessage(message). The title and the
+   * content have preset text.
    *
-   * @param parent
-   * @param message
+   * @param parent the parent for the JOptionPane
+   * @param message the message for the error
    */
   public static void showErrorMessage(Component parent, String message) {
     message = wordWrappedMessage("There has been an error! Here's the message: " + StringHelper.newline + message);
     JOptionPane.showMessageDialog(parent, message, "Error!", JOptionPane.ERROR_MESSAGE);
   }
 
-  public static void showNumberInputErrorMessage(Component parent, Class c) {
-    String message = wordWrappedMessage("Please input a valid number with the following format:" + StringHelper.newline);
-    if (c == double.class || c == Double.class
-            || c == float.class || c == Float.class
-            || c == long.class || c == Long.class) {
-      message += "123.45";
-    } else if (c == int.class || c == Integer.class) {
-      message += "123" + StringHelper.newline + "(Note, no decimal).";
-    }
+  /**
+   * Shows an error message with a preset message. Adds decimal if decimal is true
+   *
+   * @param parent the parent for the JOptionPane
+   * @param decimal whether to include a decimal in the message
+   */
+  public static void showNumberInputErrorMessage(Component parent, boolean decimal) {
+    String message = wordWrappedMessage("Please input a valid number with the following format:"
+            + StringHelper.newline
+            + "123");
+    message += (decimal) ? ".45" : StringHelper.newline + "(Note, no decimal).";
     showErrorMessage(parent, message);
   }
 
@@ -277,10 +283,10 @@ public class SwingHelper {
   }
 
   /**
-   * Sets the look and feel to the given type (like "Nimbus")... Er... Learn more here:
+   * Sets the look and feel to the given type (like "Nimbus") Learn more here:
    * http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
    *
-   * @param lookAndFeel
+   * @param lookAndFeel to set (like "Nimbus")
    */
   public static void setLookAndFeel(String lookAndFeel) {
     try {
@@ -314,12 +320,11 @@ public class SwingHelper {
   /**
    * Returns a window with a partially opaque progress Icon
    *
-   * @return
+   * @param icon the icon to set in the progress window
+   * @return a jWindow of the progress wheel
    */
-  public static JWindow getProgressWheelWindow() {
+  public static JWindow getProgressWheelWindow(final Icon icon) {
     JWindow jWindow = new JWindow() {
-
-      final Icon icon = resizeImage("/resources/icons/progressIcon.gif", 132, 132, true);
 
       {
         setOpacity(.842f);
@@ -336,14 +341,16 @@ public class SwingHelper {
   }
 
   /**
-   * @return the wordWrapChars
+   * @return the wordWrapChars. This is the number of characters to wrap JOptionPane messages with when you
+   * call wordWrappedMessage(String message)
    */
   public static int getWordWrapChars() {
     return wordWrapChars;
   }
 
   /**
-   * @param aWordWrapChars the wordWrapChars to set
+   * @param aWordWrapChars the wordWrapChars to set. This is the number of characters to wrap JOptionPane
+   * messages with when you call wordWrappedMessage(String message)
    */
   public static void setWordWrapChars(int aWordWrapChars) {
     wordWrapChars = aWordWrapChars;
