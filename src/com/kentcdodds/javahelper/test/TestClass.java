@@ -2,6 +2,7 @@ package com.kentcdodds.javahelper.test;
 
 import com.kentcdodds.javahelper.helpers.DateHelper;
 import com.kentcdodds.javahelper.helpers.OtherHelper;
+import com.kentcdodds.javahelper.helpers.StringHelper;
 import java.io.File;
 import java.util.Calendar;
 import java.util.Date;
@@ -13,19 +14,8 @@ import java.util.Date;
 public class TestClass {
 
   public static void main(String[] args) throws Exception {
-    //    IOHelper.print(new File(IOHelper.homeDir + "\\test.txt"), "Test File - 總會成員");
-    //    String fileToString = IOHelper.fileToString(IOHelper.homeDir + "\\test.txt");
-    //    System.out.println(fileToString);
-    //    Calendar cal1 = Calendar.getInstance();
-    //    cal1.set(Calendar.YEAR, -1);
-    //    cal1.set(Calendar.DAY_OF_YEAR, cal1.getActualMaximum(Calendar.DAY_OF_YEAR));
-    //    cal1.set(Calendar.HOUR_OF_DAY, cal1.getActualMaximum(Calendar.HOUR_OF_DAY));
-    //    cal1.set(Calendar.MINUTE, cal1.getActualMaximum(Calendar.MINUTE));
-    //    cal1.set(Calendar.SECOND, cal1.getActualMaximum(Calendar.SECOND));
-    //    cal1.set(Calendar.MILLISECOND, cal1.getActualMaximum(Calendar.MILLISECOND));
-    //    System.out.println(cal1.getTime());
-    //    System.out.println(DateHelper.getDayOfEra(cal1.get(Calendar.ERA), cal1.get(Calendar.YEAR), cal1.get(Calendar.DAY_OF_YEAR)));
-    //    
+    String encoded = StringHelper.percentEncodeString("Do you like Spam?!");
+    System.out.println(encoded);
   }
 
   public static void dateHelper() {
