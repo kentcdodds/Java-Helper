@@ -232,14 +232,14 @@ public class SwingHelper {
   }
 
   /**
-   * Convenience Method: Calls StringHelper.wordWrappedMessage(message, 50). A method like this allows you to
+   * Convenience Method: Calls StringHelper.wordWrappedMessage(message, getWordWrapChars()). A method like this allows you to
    * keep everything standard for JOptionPane messages
    *
    * @param message
    * @return
    */
   public static String wordWrappedMessage(String message) {
-    return StringHelper.wordWrap(message, wordWrapChars);
+    return StringHelper.wordWrap(message, getWordWrapChars());
   }
 
   /**
