@@ -172,7 +172,7 @@ public class ReflectionHelper {
    * Checks first whether it is primitive and then whether it's wrapper is a primitive wrapper. Returns true
    * if either is true
    *
-   * @param c
+   * @param c the class to check whether it's primitive
    * @return whether it's a primitive type itself or it's a wrapper for a primitive type
    */
   public static boolean isPrimitive(Class c) {

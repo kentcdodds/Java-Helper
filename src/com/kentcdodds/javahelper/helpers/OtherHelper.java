@@ -1,15 +1,7 @@
 package com.kentcdodds.javahelper.helpers;
 
 import java.io.File;
-import java.lang.reflect.Field;
-import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
 import java.util.Properties;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.regex.Pattern;
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
@@ -48,23 +40,24 @@ public class OtherHelper {
   }
 
   /**
-   * Convenience method. Allows you to call the sendEmail method with a List object. Just calls the other
-   * sendEmail();
+   * Convenience method. Allows you to call the sendEmail method with a List object. Just converts the
+   * destinationAddressList to an array and calls the other sendEmail() with the same parameters
    *
-   * @param fromAddress
-   * @param username
-   * @param password
-   * @param subject
-   * @param content
-   * @param destinationAddress
+   * @param fromAddress the address to set as the fromAddress
+   * @param username the username for authentication
+   * @param password the password for authentication
+   * @param subject the subject of the e-mail
+   * @param content the content of the e-mail
+   * @param destinationAddressList the destinationAddresses
    * @throws MessagingException
    */
-  public static void sendEmail(String fromAddress, final String username, final String password, String subject, String content, java.util.List<String> destinationAddress) throws MessagingException {
-    sendEmail(fromAddress, username, password, subject, content, destinationAddress.toArray(new String[destinationAddress.size()]));
+  public static void sendEmail(String fromAddress, final String username, final String password, String subject, String content, java.util.List<String> destinationAddressList) throws MessagingException {
+    sendEmail(fromAddress, username, password, subject, content, destinationAddressList.toArray(new String[destinationAddressList.size()]));
   }
 
   /**
-   * Sends an e-mail to the given address with the given message and subject
+   * Sends an e-mail using the javax.mail Library. Currently does not support anything but Google Apps
+   * accounts (gmail included);
    *
    * @param fromAddress
    * @param destinationAddress
@@ -76,16 +69,11 @@ public class OtherHelper {
    */
   public static void sendEmail(String fromAddress, final String username, final String password, String subject, String content, String... destinationAddress) throws MessagingException {
     Properties props = new Properties();
-    if (username.contains("@gmail.com")) {
-      props.put("mail.smtp.host", "smtp.gmail.com");
-      props.put("mail.smtp.socketFactory.port", "465");
-      props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
-      props.put("mail.smtp.auth", "true");
-      props.put("mail.smtp.port", "465");
-    } else {
-      //TODO: Make this support more than just gmail!
-      PrinterHelper.printErr("username: " + username + " in sendEmail must be a Google Apps or Gmail account. Nothing else is supported yet!");
-    }
+    props.put("mail.smtp.host", "smtp.gmail.com");
+    props.put("mail.smtp.socketFactory.port", "465");
+    props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
+    props.put("mail.smtp.auth", "true");
+    props.put("mail.smtp.port", "465");
 
     Session session = Session.getInstance(props, new javax.mail.Authenticator() {
 
