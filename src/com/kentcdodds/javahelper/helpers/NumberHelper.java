@@ -68,4 +68,22 @@ public class NumberHelper {
   public static int getPercentFromTotal(int subtotal, int total) {
     return (int) (((float) subtotal / (float) total) * 100);
   }
+
+  /**
+   * Removes all non number characters. Note: does not remove decimals (.) so a given number like this:
+   * 93)23.42-235.234 will come out looking like this 9323.42235.234
+   *
+   * @param number
+   * @return
+   */
+  public static String cleanNumber(String number) {
+    char[] toCharArray = number.toCharArray();
+    StringBuilder sb = new StringBuilder();
+    for (char c : toCharArray) {
+      if (Character.isDigit(c) || c == '.') {
+        sb.append(c);
+      }
+    }
+    return sb.toString();
+  }
 }

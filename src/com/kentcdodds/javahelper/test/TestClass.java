@@ -14,8 +14,6 @@ import java.util.Date;
 public class TestClass {
 
   public static void main(String[] args) throws Exception {
-    String encoded = StringHelper.percentEncodeString("Do you like Spam?!");
-    System.out.println(encoded);
   }
 
   public static void dateHelper() {
