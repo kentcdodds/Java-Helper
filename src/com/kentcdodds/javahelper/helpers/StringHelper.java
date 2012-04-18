@@ -1,5 +1,8 @@
 package com.kentcdodds.javahelper.helpers;
 
+import java.util.Map;
+import java.util.TreeMap;
+
 /**
  *
  * @author Kent
@@ -190,14 +193,42 @@ public class StringHelper {
    * @return
    */
   public static String percentEncodeString(String originalString) {
-    String[] badChars = {"!", "*", "'", "(", ")", ";", ":", "@", "&", "=", "+", "$", ",", "/", "?", "%", "#", "[", "]"};
-    String[] replacements = {"%21", "%2A", "%27", "%28", "%29", "%3B", "%3A", "%40", "%26", "%3D", "%2B", "%24", "%2C", "%2F", "%3F", "%25", "%23", "%5B", "%5D"};
-    String replacement = originalString;
-    for (int i = 0; i < badChars.length; i++) {
-      String badChar = badChars[i];
-      String replace = replacements[i];
-      replacement = replacement.replace(badChar, replace);
+    //It is important that % is first, if you put it any later it will replace % with anything that's replace before.
+    //Try it, you'll see what I mean.
+    Map<Character, String> replaceMap = new TreeMap<>();
+    //<editor-fold defaultstate="collapsed" desc="Set Map">
+    replaceMap.put('%', "%25");
+    replaceMap.put('!', "%21");
+    replaceMap.put('*', "%2A");
+    replaceMap.put('\'', "%27"); //Escape character. This value is: '
+    replaceMap.put('(', "%28");
+    replaceMap.put(')', "%29");
+    replaceMap.put(';', "%3B");
+    replaceMap.put(':', "%3A");
+    replaceMap.put('@', "%40");
+    replaceMap.put('&', "%26");
+    replaceMap.put('=', "%3D");
+    replaceMap.put('+', "%2B");
+    replaceMap.put('$', "%24");
+    replaceMap.put(',', "%2C");
+    replaceMap.put('/', "%2F");
+    replaceMap.put('?', "%3F");
+    replaceMap.put('#', "%23");
+    replaceMap.put('[', "%5B");
+    replaceMap.put(']', "%5D");
+    replaceMap.put(' ', "%20");
+    //</editor-fold>
+    char[] charArry = originalString.toCharArray();
+    StringBuilder fixedString = new StringBuilder();
+    for (int i = 0; i < charArry.length; i++) {
+      Character c = charArry[i];
+      String replacement = replaceMap.get(c);
+      if (replacement != null) {
+        fixedString.append(replacement);
+      } else {
+        fixedString.append(c);
+      }
     }
-    return replacement;
+    return fixedString.toString();
   }
 }
