@@ -9,8 +9,8 @@ package com.kentcdodds.javahelper.helpers;
  */
 public class PrinterHelper {
 
-  private static PrinterHelper instance;
   private boolean print = false;
+  private static PrinterHelper instance;
 
   private PrinterHelper() {
   }
@@ -28,7 +28,7 @@ public class PrinterHelper {
    * @param string
    */
   public static void print(String string) {
-    System.out.print((instance.isPrint()) ? string + StringHelper.newline : "");
+    System.out.print((getInstance().isPrint()) ? string + StringHelper.newline : "");
   }
 
   /**
@@ -37,7 +37,7 @@ public class PrinterHelper {
    * @param string
    */
   public static void printErr(String string) {
-    System.err.print((instance.isPrint()) ? string + StringHelper.newline : "");
+    System.err.print((getInstance().isPrint()) ? string + StringHelper.newline : "");
   }
 
   /**
@@ -48,7 +48,7 @@ public class PrinterHelper {
   }
 
   /**
-   * @param print the print to set
+   * @param print 
    */
   public void setPrint(boolean print) {
     this.print = print;
