@@ -188,7 +188,9 @@ public class IOHelper {
    * Replaces the given find with the given replace in all the files under the given directory of the given
    * file extension(s). If the file extension is null (or omitted), it will ignore the file extension and
    * apply to all files regardless of their extension. Calls replaceInFile(file, find, replace) on each of the
-   * files. Skips any files which throw IO exceptions and adds it to the list which is returned
+   * files. Skips any files which throw IO exceptions and adds it to the list which is returned. You can call
+   * sendReplaceInAllFilesToPrinter(List<File>[]) on the returned array and it will send information to the
+   * Printer
    *
    * @param topDirectory the topDirectory to find the files in
    * @param sublevels determines how many subdirectories to go before it stops adding files. Give 0 to get

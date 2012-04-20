@@ -13,8 +13,10 @@ import java.util.List;
 public class TestClass {
 
   public static void main(String[] args) throws Exception {
-        List<File>[] replaced = IOHelper.replaceInAllFiles(new File("C:\\Users\\Kent\\Documents\\My Dropbox\\Work\\MGF\\NetBeansProjects\\MGFVF\\src\\org\\moregoodfoundation\\mgfvf"), 5, "metagui", "org.moregoodfoundation.mgfvf.metagui");
-        
+    List<File>[] replaced = IOHelper.replaceInAllFiles(new File("C:\\Users\\Kent\\Documents\\My Dropbox\\Work\\MGF\\NetBeansProjects\\MGFVF\\src\\org\\moregoodfoundation\\mgfvf"), 5, "org.moregoodfoundation.mgfvf.resources", "org/moregoodfoundation/mgfvf/resources");
+    PrinterHelper.setInstancePrint(true);
+    IOHelper.sendReplaceInAllFilesToPrinter(replaced);
+    System.exit(0);
   }
 
   public static void dateHelper() {
