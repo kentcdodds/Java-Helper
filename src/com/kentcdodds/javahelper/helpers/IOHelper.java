@@ -222,6 +222,29 @@ public class IOHelper {
     return new java.util.List[]{appliedFiles, unappliedFiles, errorFiles};
   }
 
+  public static void sendReplaceInAllFilesToPrinter(java.util.List<File>[] replaced) {
+    java.util.List<File> appliedFiles = replaced[0];
+    java.util.List<File> unappliedFiles = replaced[1];
+    java.util.List<File> errorFiles = replaced[2];
+    PrinterHelper.print("Applied files");
+    for (File file : appliedFiles) {
+      PrinterHelper.print(file);
+    }
+    PrinterHelper.print("Total Applied Files: " + appliedFiles.size());
+    PrinterHelper.print(StringHelper.newline);
+    PrinterHelper.print("Unapplied files");
+    for (File file : unappliedFiles) {
+      PrinterHelper.print(file);
+    }
+    PrinterHelper.print("Total Unapplied Files: " + unappliedFiles.size());
+    PrinterHelper.print(StringHelper.newline);
+    PrinterHelper.printErr("Error files");
+    for (File file : errorFiles) {
+      PrinterHelper.printErr(file);
+    }
+    PrinterHelper.printErr("Total Error Files: " + errorFiles.size());
+  }
+
   /**
    * Gets all the files under the given file (not including the given file).
    *

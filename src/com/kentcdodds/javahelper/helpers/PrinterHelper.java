@@ -50,22 +50,22 @@ public class PrinterHelper {
   /**
    * Prints the given String if the print variable is true
    *
-   * @param string
+   * @param object to print
    */
-  public static void print(String string) {
+  public static void print(Object object) {
     if (getInstance().isPrint()) {
-      System.out.println(string);
+      System.out.println(object);
     }
   }
 
   /**
    * Prints the given String in error type if the print variable is true
    *
-   * @param string
+   * @param object to print
    */
-  public static void printErr(String string) {
+  public static void printErr(Object object) {
     if (getInstance().isPrint()) {
-      System.err.println(string);
+      System.err.println(object);
     }
   }
 
