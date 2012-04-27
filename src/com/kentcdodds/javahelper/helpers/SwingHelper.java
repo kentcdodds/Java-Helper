@@ -1,7 +1,10 @@
 package com.kentcdodds.javahelper.helpers;
 
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.File;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.*;
 import org.psafix.folderchooser.JFolderChooser;
 
@@ -41,70 +44,44 @@ public class SwingHelper {
   /**
    * This method resizes the given image
    *
-   * @param location
-   * @param setWidth set as true if the given size is for the width, false if it's for the height
-   * @param size the size of the width or height
-   * @return
-   */
-  public static ImageIcon resizeImage(String location, boolean setWidth, int size) {
-    if (setWidth) {
-      return resizeImage(location, size, -1, true);
-    } else {
-      return resizeImage(location, -1, size, true);
-    }
-  }
-
-  /**
-   * Convenience method: Just calls the other resizeImage method. Makes it possible for you to pass in a
-   * dimension object
-   *
-   * @param location
-   * @param dimension
-   * @param max
-   * @return
-   */
-  public static ImageIcon resizeImage(String location, Dimension dimension, boolean max) {
-    return resizeImage(location, (int) dimension.getWidth(), (int) dimension.getHeight(), max);
-  }
-
-  /**
-   * This method resizes the given image
-   *
-   * @param location
+   * @param image 
    * @param width
    * @param height
    * @param max if true, sets the width and height as maximum heights and widths, if false, they are minimums
    * @return
    */
-  public static ImageIcon resizeImage(String location, int width, int height, boolean max) {
-    ImageIcon imageIcon;
-    try {
-      imageIcon = new ImageIcon(SwingHelper.class.getResource(location));
-    } catch (NullPointerException e) {
-      imageIcon = new ImageIcon(location);
+  public static Image resizeImage(Image image, int width, int height, boolean max) {
+    //Create the imageIcon so we can get the height and width of the image as it is currently
+    int currentHeight = image.getHeight(null);
+    int currentWidth = image.getWidth(null);
+    int expectedWidth = (height * currentWidth) / currentHeight;
+    boolean resizeByWidth = false;
+    if (max && expectedWidth > width) {
+      resizeByWidth = true;
+    } else if (!max && expectedWidth < width) {
+      resizeByWidth = true;
     }
-    Image image = imageIcon.getImage();
-    Image newimg = image.getScaledInstance(-1, height, java.awt.Image.SCALE_SMOOTH);
-    Image image1 = new ImageIcon(newimg).getImage();
-    int width1 = image1.getWidth(null);
-    if ((max && width1 > width) || (!max && width1 < width)) {
-      newimg = image.getScaledInstance(width, -1, java.awt.Image.SCALE_SMOOTH);
+    Image newImage;
+    if (resizeByWidth) {
+      newImage = image.getScaledInstance(-1, height, Image.SCALE_SMOOTH);
+    } else {
+      newImage = image.getScaledInstance(width, -1, Image.SCALE_SMOOTH);
     }
-    return new ImageIcon(newimg);
+    return newImage;
   }
 
   /**
    * this method adds a given image to the bottom right of the layout
    *
    * @param container where you want the object
-   * @param file the image you wish to add
+   * @param image
    * @param setWidth if true will set the width as the given size, if false, will set the height as the given
    * size
    * @param size 0 - 4 is smallest to biggest
    * @param anchor use java.awt.GridBagConstraints.CENTER (for example)
    * @param bottom if true, image will appear on the bottom, if false, image will appear on the right.
    */
-  public static void addImage(Container container, String file, boolean setWidth, int size, int anchor, boolean bottom) {
+  public static void addImage(Container container, Image image, boolean setWidth, int size, int anchor, boolean bottom) {
     GridBagLayout gbl = (java.awt.GridBagLayout) container.getLayout();
     JPanel logoPanel = new JPanel();
     logoPanel.setLayout(new java.awt.GridBagLayout());
@@ -125,7 +102,13 @@ public class SwingHelper {
     gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 10);
     container.add(logoPanel, gridBagConstraints);
     JLabel logo = new JLabel();
-    logo.setIcon(resizeImage(file, true, size));
+    ImageIcon newImage;
+    if (setWidth) {
+      newImage = new ImageIcon(resizeImage(image, size, -1, true));
+    } else {
+      newImage = new ImageIcon(resizeImage(image, -1, size, true));
+    }
+    logo.setIcon(newImage);
     logoPanel.add(logo);
   }
 
