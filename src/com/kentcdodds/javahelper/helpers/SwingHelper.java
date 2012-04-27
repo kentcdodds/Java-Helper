@@ -42,16 +42,15 @@ public class SwingHelper {
   }
 
   /**
-   * This method resizes the given image
-   *
-   * @param image 
-   * @param width
-   * @param height
-   * @param max if true, sets the width and height as maximum heights and widths, if false, they are minimums
-   * @return
-   */
+  * This method resizes the given image
+  *
+  * @param image 
+  * @param width
+  * @param height
+  * @param max if true, sets the width and height as maximum heights and widths, if false, they are minimums
+  * @return
+  */
   public static Image resizeImage(Image image, int width, int height, boolean max) {
-    //Create the imageIcon so we can get the height and width of the image as it is currently
     int currentHeight = image.getHeight(null);
     int currentWidth = image.getWidth(null);
     int expectedWidth = (height * currentWidth) / currentHeight;
