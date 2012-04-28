@@ -224,6 +224,12 @@ public class IOHelper {
     return new java.util.List[]{appliedFiles, unappliedFiles, errorFiles};
   }
 
+  /**
+   * Prints the given list array of files. It's pretty much only useful for the return on the
+   * replaceInAllFiles method
+   *
+   * @param replaced
+   */
   public static void sendReplaceInAllFilesToPrinter(java.util.List<File>[] replaced) {
     java.util.List<File> appliedFiles = replaced[0];
     java.util.List<File> unappliedFiles = replaced[1];
@@ -240,11 +246,11 @@ public class IOHelper {
     }
     PrinterHelper.print("Total Unapplied Files: " + unappliedFiles.size());
     PrinterHelper.print(StringHelper.newline);
-    PrinterHelper.printErr("Error files");
+    PrinterHelper.print("Error files");
     for (File file : errorFiles) {
-      PrinterHelper.printErr(file);
+      PrinterHelper.print(file);
     }
-    PrinterHelper.printErr("Total Error Files: " + errorFiles.size());
+    PrinterHelper.print("Total Error Files: " + errorFiles.size());
   }
 
   /**
