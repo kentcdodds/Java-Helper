@@ -70,6 +70,24 @@ public class PrinterHelper {
   }
 
   /**
+   * Prints a new line if Print on the current instance is true
+   */
+  public static void print() {
+    if (getInstance().isPrint()) {
+      System.out.println();
+    }
+  }
+
+  /**
+   * Prints a new error line if Print on the current instance is true
+   */
+  public static void printErr() {
+    if (getInstance().isPrint()) {
+      System.err.println();
+    }
+  }
+
+  /**
    * Convenience method. sets the dialog title and then calls showMessageConsole()
    *
    * @param dialogTitle
