@@ -68,19 +68,19 @@ public class IOHelper {
     return readerToString(fr);
   }
 
-  /**
-   * Takes the given resource (based on the given class) and returns that as a string.
-   *
-   * @param location
-   * @param c
-   * @return
-   * @throws IOException
-   */
-  public static String resourceToString(String location, Class c) throws IOException {
-    InputStream is = c.getResourceAsStream(location);
-    InputStreamReader r = new InputStreamReader(is);
-    return readerToString(r);
-  }
+    /**
+    * Takes the given resource (based on the given class) and returns that as a string.
+    *
+    * @param location of the file
+    * @param c class to get the resource from
+    * @return the file as a string
+    * @throws IOException
+    */
+    public static String resourceToString(String location, Class c) throws IOException {
+      InputStream is = c.getResourceAsStream(location);
+      InputStreamReader r = new InputStreamReader(is);
+      return readerToString(r);
+    }
 
   /**
    * Returns all the lines in the scanner's stream as a String

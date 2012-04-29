@@ -1,10 +1,16 @@
 package com.kentcdodds.javahelper.test;
 
 import com.kentcdodds.javahelper.helpers.*;
+import java.awt.Image;
+import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
+import java.net.URL;
 import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
 
 /**
  *
@@ -12,13 +18,43 @@ import java.util.List;
  */
 public class TestClass {
 
+  public static String testImageLocation = "/com/kentcdodds/javahelper/resources/iSayHiGuy.jpg";
+
   public static void main(String[] args) throws Exception {
-    List<File>[] replaced = IOHelper.replaceInAllFiles(new File("C:\\Users\\Kent\\Documents\\My Dropbox\\Work\\MGF\\NetBeansProjects\\MGFVF\\src\\org\\moregoodfoundation\\mgfvf"), 5, "org.moregoodfoundation.mgfvf.resources", "org/moregoodfoundation/mgfvf/resources");
-    PrinterHelper.setInstancePrint(true);
-    IOHelper.sendReplaceInAllFilesToPrinter(replaced);
+    setStuff();
+    resizeImage();
+    //    List<File>[] replaced = IOHelper.replaceInAllFiles(new File("C:\\Users\\Kent\\Documents\\My Dropbox\\Work\\MGF\\NetBeansProjects\\MyVideoFacilitator\\src"),
+    //            5, "org/mvf/resources/", "/org/mvf/resources/");
+    //    PrinterHelper.setInstancePrint(true);
+    //    IOHelper.sendReplaceInAllFilesToPrinter(replaced);
     System.exit(0);
   }
 
+  /**
+   * The stuff I want to set at the beginning of all my tests.
+   */
+  public static void setStuff() {
+    SwingHelper.setSystemLookAndFeel();
+    PrinterHelper.setInstancePrint(true);
+  }
+
+  /**
+   * Test resizeImage functionality
+   */
+  public static void resizeImage() throws IOException {
+    BufferedImage im = ImageIO.read(TestClass.class.getResource(testImageLocation));
+    Image resizeImage = SwingHelper.resizeImage(im, 500, 500, true);
+    JLabel label = new JLabel(new ImageIcon(resizeImage));
+    JDialog dialog = new JDialog();
+    dialog.setModal(true); //Important if System.exit(0) is called :)
+    dialog.getContentPane().add(label);
+    SwingHelper.centerAndPack(dialog);
+    dialog.setVisible(true);
+  }
+
+  /**
+   * Tests some of the date helper stuff
+   */
   public static void dateHelper() {
     Calendar cal1 = Calendar.getInstance();
     Calendar cal2 = Calendar.getInstance();
@@ -51,6 +87,5 @@ public class TestClass {
     System.out.println("Cal1: " + cal1.getTime());
     System.out.println("Cal2: " + cal2.getTime());
     System.out.println("DaysDifference: " + DateHelper.getDaysDifference(cal1.getTime(), cal2.getTime()));
-
   }
 }
