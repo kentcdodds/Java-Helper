@@ -59,59 +59,60 @@ public class IOHelper {
   /**
    * Takes the file and returns it in a string
    *
-   * @param location
-   * @return
-   * @throws IOException
+   * @param fileLocation
+   * @return the file in String form
+   * @throws IOException when trying to read from the file
    */
-  public static String fileToString(String location) throws IOException {
-    FileReader fr = new FileReader(new File(location));
-    return readerToString(fr);
+  public static String fileToString(String fileLocation) throws IOException {
+    InputStreamReader streamReader = new InputStreamReader(new FileInputStream(fileLocation), "UTF-8");
+    return readerToString(streamReader);
   }
 
-    /**
-    * Takes the given resource (based on the given class) and returns that as a string.
-    *
-    * @param location of the file
-    * @param c class to get the resource from
-    * @return the file as a string
-    * @throws IOException
-    */
-    public static String resourceToString(String location, Class c) throws IOException {
-      InputStream is = c.getResourceAsStream(location);
-      InputStreamReader r = new InputStreamReader(is);
-      return readerToString(r);
-    }
+  /**
+   * Takes the given resource (based on the given class) and returns that as a string.
+   *
+   * @param resourceLocation of the file
+   * @param klass class to get the resource from
+   * @return the file as a string
+   * @throws IOException when trying to read from the file
+   */
+  public static String resourceToString(Class klass, String resourceLocation) throws IOException {
+    InputStream inputStream = klass.getResourceAsStream(resourceLocation);
+    InputStreamReader streamReader = new InputStreamReader(inputStream, "UTF-8");
+    return readerToString(streamReader);
+  }
 
   /**
    * Returns all the lines in the scanner's stream as a String
    *
-   * @param r
+   * @param streamReader
    * @return
-   * @throws IOException
+   * @throws IOException when trying to read from the file
    */
-  public static String readerToString(InputStreamReader r) throws IOException {
-    StringWriter sw = new StringWriter();
-    char[] buf = new char[1024];
-    int len;
-    while ((len = r.read(buf)) > 0) {
-      sw.write(buf, 0, len);
+  public static String readerToString(InputStreamReader streamReader) throws IOException {
+    StringWriter stringWriter = new StringWriter();
+    char[] buffer = new char[1024];
+    int length;
+    while ((length = streamReader.read(buffer)) > 0) {
+      stringWriter.write(buffer, 0, length);
     }
-    r.close();
-    sw.close();
-    return sw.toString();
+    streamReader.close();
+    stringWriter.close();
+    return stringWriter.toString();
   }
 
   /**
    * Copies the given resource file to the given destination. Does not check whether the destination exists.
    *
+   * @param klass 
    * @param resourceLocation
    * @param destinationFilepath
    * @throws FileNotFoundException
    * @throws IOException
    */
-  public static void copyResourceFile(String resourceLocation, String destinationFilepath) throws FileNotFoundException, IOException {
-    InputStream is = StringHelper.class.getResourceAsStream(resourceLocation);
-    saveInputStream(is, destinationFilepath);
+  public static void copyResourceFile(Class klass, String resourceLocation, String destinationFilepath) throws FileNotFoundException, IOException {
+    InputStream inputString = klass.getResourceAsStream(resourceLocation);
+    saveInputStream(inputString, destinationFilepath);
   }
 
   /**
@@ -130,20 +131,20 @@ public class IOHelper {
   /**
    * Saves the given InputStream to a file at the destination. Does not check whether the destination exists.
    *
-   * @param in
+   * @param inputStream
    * @param destination
    * @throws FileNotFoundException
    * @throws IOException
    */
-  public static void saveInputStream(InputStream in, String destination) throws FileNotFoundException, IOException {
+  public static void saveInputStream(InputStream inputStream, String destination) throws FileNotFoundException, IOException {
     File outputFile = new File(destination);
     try (OutputStream out = new FileOutputStream(outputFile)) {
-      byte[] buf = new byte[1024];
-      int len;
-      while ((len = in.read(buf)) > 0) {
-        out.write(buf, 0, len);
+      byte[] buffer = new byte[1024];
+      int length;
+      while ((length = inputStream.read(buffer)) > 0) {
+        out.write(buffer, 0, length);
       }
-      in.close();
+      inputStream.close();
     }
   }
 
