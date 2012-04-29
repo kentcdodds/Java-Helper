@@ -32,28 +32,20 @@ public class IOHelper {
   /**
    * Removes unsafe filename characters from the given string.
    *
-   * @param string
-   * @return filenameSafeString
+   * @param string the string to make filename safe
+   * @param replace what you want bad characters to be replaced with (note, if you give an invalid character
+   * for this parameter, it will be automatically replaced with an empty string, the same applies if null is
+   * given).
+   * @return the string with characters replaced
    */
-  public static String makeFilenameSafe(String string) {
-    StringBuilder filenameSafeString = new StringBuilder(string.length());
-    filenameSafeString.setLength(string.length());
-    char[] badCharacters = new char[]{'\\', '/', ':', '*', '?', '\"', '<', '>', '|'};
-    int current = 0;
-    for (int i = 0; i < string.length(); i++) {
-      char cur = string.charAt(i);
-      boolean found = false;
-      for (int j = 0; j < badCharacters.length; j++) {
-        if (cur == badCharacters[j]) {
-          found = true;
-          break;
-        }
-      }
-      if (!found) {
-        filenameSafeString.setCharAt(current++, cur);
-      }
+  public static String makeFilenameSafe(String string, String replace) {
+    String[] badCharacters = new String[]{"\\", "/", ":", "*", "?", "\"", "<", ">", "|"};
+    if (replace == null) {
+      replace = "";
+    } else {
+      replace = StringHelper.replaceInString(replace, "", badCharacters);
     }
-    return filenameSafeString.toString();
+    return StringHelper.replaceInString(string, replace, badCharacters);
   }
 
   /**
@@ -104,7 +96,7 @@ public class IOHelper {
   /**
    * Copies the given resource file to the given destination. Does not check whether the destination exists.
    *
-   * @param klass 
+   * @param klass
    * @param resourceLocation
    * @param destinationFilepath
    * @throws FileNotFoundException
