@@ -44,6 +44,21 @@ public class StringHelper {
   }
 
   /**
+   * Simple method. Read it like this: Replace "items" with "replace" in "string"
+   *
+   * @param string the string to replace items in
+   * @param replace the text to replace the items with
+   * @param items the items to replace
+   * @return the replaced string 
+   */
+  public static String replaceInString(String string, String replace, String... items) {
+    for (String item : items) {
+      string = string.replace(item, replace);
+    }
+    return string;
+  }
+
+  /**
    * Calls isNull from OtherHelper on the given parameters first, then calls isEmpty on them. Returns true on
    * first true result
    *
