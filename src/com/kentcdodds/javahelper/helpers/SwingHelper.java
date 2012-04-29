@@ -101,8 +101,9 @@ public class SwingHelper {
     return resizeImage(image, width, height, max);
   }
   
-  public static Image resizeImageFromResource(String location, int width, int height, boolean max) throws IOException {
-    BufferedImage image = ImageIO.read(SwingHelper.class.getResource(location));
+  public static Image resizeImageFromResource(Class klass, String location, int width, int height, boolean max) throws IOException {
+    BufferedImage image = ImageIO.read(klass.getResource(location));
+    return resizeImage(image, width, height, max);
   }
 
   /**
