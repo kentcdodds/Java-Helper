@@ -1,5 +1,6 @@
 package com.kentcdodds.javahelper.test;
 
+import model.Email;
 import com.kentcdodds.javahelper.helpers.*;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
@@ -7,29 +8,52 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import javax.imageio.ImageIO;
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeBodyPart;
 import javax.swing.ImageIcon;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
+import model.EmailAttachment;
 
 /**
  *
  * @author Kent
  */
 public class TestClass {
-
+  
   public static String testImageLocation = "/com/kentcdodds/javahelper/resources/iSayHiGuy.jpg";
-
+  
   public static void main(String[] args) throws Exception {
     setStuff();
-    random();
+    email();
     //    List<File>[] replaced = IOHelper.replaceInAllFiles(new File("C:\\Users\\Kent\\Documents\\My Dropbox\\Work\\MGF\\NetBeansProjects\\MyVideoFacilitator\\src"),
     //            5, "org/mvf/resources/", "/org/mvf/resources/");
     //    PrinterHelper.setInstancePrint(true);
     //    IOHelper.sendReplaceInAllFilesToPrinter(replaced);
     System.exit(0);
+  }
+  
+  public static void email() throws MessagingException {
+    String from = "test@example.org";
+    List<String> to = new ArrayList<>();
+    to.add("dfkewofds@mailinator.com");
+    List<String> cc = new ArrayList<>();
+    cc.add("dfkefofds@mailinator.com");
+    List<String> bcc = new ArrayList<>();
+    bcc.add("me@kentcdodds.com");
+    String subject = "This is a test subject!";
+    Email email = new Email(from, to, cc, bcc, subject, "This is the message!");
+    EmailAttachment attachment = new EmailAttachment();
+    attachment.setFile(new File("C:\\Users\\kentcdodds\\Documents\\test attachment.txt"));
+    email.addEmailAttachment(attachment);
+    EmailHelper.sendEmail(EmailHelper.getGoogleSession("tester", "yourpassword"), email);
+//    System.out.println(ReflectionHelper.getObjectInString(email, true, 1, true, 1));
+    System.out.println("Email sent!");
   }
 
   /**
@@ -53,12 +77,12 @@ public class TestClass {
     SwingHelper.centerAndPack(dialog);
     dialog.setVisible(true);
   }
-
+  
   public static void random() {
     boolean testDate = false;
     boolean testRandomStrings = true;
     int numberOfTests = 100;
-
+    
     if (testDate) {
       SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
       Date oldest = RandomHelper.getRandomDate(2012, 2012);
@@ -93,7 +117,7 @@ public class TestClass {
       }
     }
   }
-  
+
   /**
    * Tests some of the date helper stuff
    */
@@ -125,7 +149,7 @@ public class TestClass {
     cal2.set(Calendar.MINUTE, cal2.getActualMinimum(Calendar.MINUTE));
     cal2.set(Calendar.SECOND, cal2.getActualMinimum(Calendar.SECOND));
     cal2.set(Calendar.MILLISECOND, cal2.getActualMinimum(Calendar.MILLISECOND));
-
+    
     System.out.println("Cal1: " + cal1.getTime());
     System.out.println("Cal2: " + cal2.getTime());
     System.out.println("DaysDifference: " + DateHelper.getDaysDifference(cal1.getTime(), cal2.getTime()));
