@@ -13,6 +13,7 @@ import java.util.logging.Logger;
 public class IOHelper {
 
   public static final String homeDir = System.getProperty("user.home");
+  public static final String[] badFileNameCharacters = new String[]{"\\", "/", ":", "*", "?", "\"", "<", ">", "|"};
 
   /**
    * Prints the given file string tot he file destination. Does not check the parent directory first
@@ -39,13 +40,27 @@ public class IOHelper {
    * @return the string with characters replaced
    */
   public static String makeFilenameSafe(String string, String replace) {
-    String[] badCharacters = new String[]{"\\", "/", ":", "*", "?", "\"", "<", ">", "|"};
     if (replace == null) {
       replace = "";
     } else {
-      replace = StringHelper.replaceInString(replace, "", badCharacters);
+      replace = StringHelper.replaceInString(replace, "", badFileNameCharacters);
     }
-    return StringHelper.replaceInString(string, replace, badCharacters);
+    return StringHelper.replaceInString(string, replace, badFileNameCharacters);
+  }
+
+  /**
+   * Checks whether the given string contains any bad filename characters.
+   *
+   * @param string the string to check
+   * @return whether the given string has bad filename characters
+   */
+  public static boolean hasBadFileNameCharacters(String string) {
+    for (String badChar : badFileNameCharacters) {
+      if (string.contains(badChar)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   /**
