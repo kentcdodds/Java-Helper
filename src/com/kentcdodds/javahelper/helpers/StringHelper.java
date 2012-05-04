@@ -49,7 +49,7 @@ public class StringHelper {
    * @param string the string to replace items in
    * @param replace the text to replace the items with
    * @param items the items to replace
-   * @return the replaced string 
+   * @return the replaced string
    */
   public static String replaceInString(String string, String replace, String... items) {
     for (String item : items) {
@@ -127,5 +127,24 @@ public class StringHelper {
       newString = originalString;
     }
     return newString;
+  }
+
+  /**
+   * Separates the given strings with the given separator (", " for example). Does not add the separator to
+   * the end of the list
+   *
+   * @param separator
+   * @param strings
+   * @return
+   */
+  public static String splitBy(String separator, String... strings) {
+    StringBuilder sb = new StringBuilder();
+    for (int i = 0; i < strings.length; i++) {
+      if (i > 0) {
+        sb.append(separator);
+      }
+      sb.append(strings[i]);
+    }
+    return sb.toString();
   }
 }
