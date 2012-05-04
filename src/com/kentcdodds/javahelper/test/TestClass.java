@@ -6,7 +6,9 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JDialog;
@@ -51,6 +53,46 @@ public class TestClass {
     dialog.setVisible(true);
   }
 
+  public static void random() {
+    boolean testDate = false;
+    boolean testRandomStrings = true;
+    int numberOfTests = 100;
+
+    if (testDate) {
+      SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+      Date oldest = RandomHelper.getRandomDate(2012, 2012);
+      Date newest = RandomHelper.getRandomDate(2012, 2012);
+      for (int i = 0; i < numberOfTests; i++) {
+        Date randomDate = RandomHelper.getRandomDate(2012, 2012);
+        System.out.println(sdf.format(randomDate));
+        if (randomDate.getTime() < oldest.getTime()) {
+          oldest = randomDate;
+        }
+        if (randomDate.getTime() > newest.getTime()) {
+          newest = randomDate;
+        }
+      }
+      System.out.println();
+      System.out.println("Oldest: " + sdf.format(oldest));
+      System.out.println("Newest: " + sdf.format(newest));
+    }
+    if (testRandomStrings) {
+      for (int i = 0; i < numberOfTests; i++) {
+        String randomFirstName = RandomHelper.getRandomFirstName();
+        String randomLastName = RandomHelper.getRandomLastName();
+        String randomState = RandomHelper.getRandomState();
+        String state = RandomHelper.getState(randomState);
+        String randomCity = RandomHelper.getRandomCity(randomState);
+        System.out.println(randomFirstName + " " + randomLastName);
+        System.out.println(RandomHelper.getRandomPhoneNumber() + ", " + RandomHelper.getEmail(randomFirstName, randomLastName, "MyStuff"));
+        System.out.println(RandomHelper.getRandomStreetAddress() + ", " + randomCity + ", "
+                + randomState + " (" + state + ") " + RandomHelper.getRandomZipCode());
+        System.out.println("Computer ID: " + RandomHelper.getRandomMacAddress());
+        System.out.println();
+      }
+    }
+  }
+  
   /**
    * Tests some of the date helper stuff
    */
