@@ -34,9 +34,8 @@ public class IOHelper {
    * Removes unsafe filename characters from the given string.
    *
    * @param string the string to make filename safe
-   * @param replace what you want bad characters to be replaced with (note, if you give an invalid character
-   * for this parameter, it will be automatically replaced with an empty string, the same applies if null is
-   * given).
+   * @param replace what you want bad characters to be replaced with (note, if you give an invalid character for this
+   * parameter, it will be automatically replaced with an empty string, the same applies if null is given).
    * @return the string with characters replaced
    */
   public static String makeFilenameSafe(String string, String replace) {
@@ -156,8 +155,37 @@ public class IOHelper {
   }
 
   /**
-   * Using the given urlString, this method creates and returns the buffered reader for that URL. Specifies
-   * UTF-8 format
+   * Reads the given bytes into an array. The bytes must not exceed the array size limit of Integer.MAX_VALUE (which is
+   * 2^31 -1). This means you can only use this method with files under 2 megabytes
+   *
+   * @param file
+   * @return
+   * @throws FileNotFoundException
+   * @throws IOException
+   */
+  public static byte[] getFileBytes(File file) throws FileNotFoundException, IOException {
+    byte[] bytes;
+    try (InputStream inputStream = new FileInputStream(file)) {
+      long length = file.length();
+      if (length > Integer.MAX_VALUE) {
+        throw new IOException("The file is too large to be read into an array");
+      }
+      bytes = new byte[(int) length];
+      int offset = 0;
+      int numRead = 0;
+      while (offset < bytes.length
+              && (numRead = inputStream.read(bytes, offset, bytes.length - offset)) >= 0) {
+        offset += numRead;
+      }
+      if (offset < bytes.length) {
+        throw new IOException("Could not completely read file " + file.getName());
+      }
+    }
+    return bytes;
+  }
+
+  /**
+   * Using the given urlString, this method creates and returns the buffered reader for that URL. Specifies UTF-8 format
    *
    * @param urlString
    * @return
@@ -172,14 +200,14 @@ public class IOHelper {
   }
 
   /**
-   * Replaces the given find with the given replace in the given file. Reads the file to a string, replaces
-   * the find with the replace in the string and prints the new string on top of the original file.
+   * Replaces the given find with the given replace in the given file. Reads the file to a string, replaces the find
+   * with the replace in the string and prints the new string on top of the original file.
    *
    * @param file the file to conduct the find/replace on
    * @param find the find to replace
    * @param replace the text to replace the find with
-   * @return whether anything was different in the replace call. It does not print over the original file if
-   * nothing is different
+   * @return whether anything was different in the replace call. It does not print over the original file if nothing is
+   * different
    * @throws IOException
    */
   public static boolean replaceInFile(File file, String find, String replace) throws IOException {
@@ -193,23 +221,22 @@ public class IOHelper {
   }
 
   /**
-   * Replaces the given find with the given replace in all the files under the given directory of the given
-   * file extension(s). If the file extension is null (or omitted), it will ignore the file extension and
-   * apply to all files regardless of their extension. Calls replaceInFile(file, find, replace) on each of the
-   * files. Skips any files which throw IO exceptions and adds it to the list which is returned. You can call
-   * sendReplaceInAllFilesToPrinter(List<File>[]) on the returned array and it will send information to the
-   * Printer
+   * Replaces the given find with the given replace in all the files under the given directory of the given file
+   * extension(s). If the file extension is null (or omitted), it will ignore the file extension and apply to all files
+   * regardless of their extension. Calls replaceInFile(file, find, replace) on each of the files. Skips any files which
+   * throw IO exceptions and adds it to the list which is returned. You can call
+   * sendReplaceInAllFilesToPrinter(List<File>[]) on the returned array and it will send information to the Printer
    *
    * @param topDirectory the topDirectory to find the files in
-   * @param sublevels determines how many subdirectories to go before it stops adding files. Give 0 to get
-   * files only in the given directory
+   * @param sublevels determines how many subdirectories to go before it stops adding files. Give 0 to get files only in
+   * the given directory
    * @param find the text to be replaced by the given replace
    * @param replace the text to replace the given find with
    * @param extension the any-number of extensions to apply the find/replace to. Omit for any type
    * @return An array of Lists of Files: arry[0] = files which applied and were successful in the find/replace
-   * operation; arry[1] = files which may have been successful, but there would have been no change to the
-   * file during the find/replace operation so the file was not overwritten; arry[2] = files which threw an
-   * IOException for any reason.
+   * operation; arry[1] = files which may have been successful, but there would have been no change to the file during
+   * the find/replace operation so the file was not overwritten; arry[2] = files which threw an IOException for any
+   * reason.
    */
   public static java.util.List<File>[] replaceInAllFiles(File topDirectory, int sublevels, String find, String replace, String... extension) {
     java.util.List<File> files = getAllFiles(topDirectory, sublevels, extension);
@@ -233,8 +260,7 @@ public class IOHelper {
   }
 
   /**
-   * Prints the given list array of files. It's pretty much only useful for the return on the
-   * replaceInAllFiles method
+   * Prints the given list array of files. It's pretty much only useful for the return on the replaceInAllFiles method
    *
    * @param replaced
    */
@@ -265,10 +291,10 @@ public class IOHelper {
    * Gets all the files under the given file (not including the given file).
    *
    * @param file the file to get files under
-   * @param sublevels determines how many subdirectories to go before it stops adding files. Give 0 to get
-   * files only in the given directory (or just call getDirectoryFiles(file, extension) instead).
-   * @param extension the extension(s) to add to the returned list. If null or omitted will add all files to
-   * the returned list (not including directories)
+   * @param sublevels determines how many subdirectories to go before it stops adding files. Give 0 to get files only in
+   * the given directory (or just call getDirectoryFiles(file, extension) instead).
+   * @param extension the extension(s) to add to the returned list. If null or omitted will add all files to the
+   * returned list (not including directories)
    * @return
    */
   public static java.util.List<File> getAllFiles(File file, int sublevels, String... extension) {
