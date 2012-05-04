@@ -32,7 +32,7 @@ public class ReflectionHelper {
           boolean scanInnerObjects,
           int limitInners) {
     StringBuilder sb = new StringBuilder();
-    getObjectInString(sb, o, scanSupers, limitSupers, scanInnerObjects, limitInners);
+    appendObjectToStringBuilder(sb, o, scanSupers, limitSupers, scanInnerObjects, limitInners, "");
     return sb.toString();
   }
 
@@ -46,27 +46,29 @@ public class ReflectionHelper {
    * @param scanInnerObjects
    * @param limitInners
    */
-  private static void getObjectInString(
+  private static void appendObjectToStringBuilder(
           StringBuilder sb,
           Object o,
           boolean scanSupers,
           int limitSupers,
           boolean scanInnerObjects,
-          int limitInners) {
+          int limitInners,
+          String prefix) {
     Class<? extends Object> aClass = o.getClass();
     if (aClass.getSuperclass() != Object.class && scanSupers && limitSupers > 0) {
-      getObjectInString(sb, o, scanSupers, (limitSupers - 1), scanInnerObjects, limitInners);
+      appendObjectToStringBuilder(sb, o, scanSupers, (limitSupers - 1), scanInnerObjects, limitInners, prefix);
     }
-    sb.append(aClass.getSimpleName()).append(":").append(StringHelper.newline);
+    sb.append(prefix).append(aClass.getName()).append(":").append(StringHelper.newline);
     for (Field field : aClass.getDeclaredFields()) {
       try {
         field.setAccessible(true);
-        if (!isPrimitive(field.getClass()) && scanInnerObjects) {
-          getObjectInString(sb, field.get(o), scanSupers, limitSupers, scanInnerObjects, (limitInners - 1));
+        Class<? extends Object> fieldClass = field.get(o).getClass();
+        if (!isPrimitive(fieldClass) && fieldClass != String.class && scanInnerObjects) {
+          appendObjectToStringBuilder(sb, field.get(o), scanSupers, limitSupers, scanInnerObjects, (limitInners - 1), prefix + "\t");
         }
         String name = field.getName();
         Object value = field.get(o);
-        sb.append(StringHelper.newline).append("\t").append(name).append(": ").append(value);
+        sb.append(prefix).append("\t").append(name).append(": ").append(value).append(StringHelper.newline);
       } catch (IllegalArgumentException | IllegalAccessException ex) {
         Logger.getLogger(ReflectionHelper.class.getName()).log(Level.SEVERE, null, ex);
       }
@@ -80,8 +82,8 @@ public class ReflectionHelper {
    * @param klass the class to get the fields from (in most cases you'll just call object.getClass())
    * @param iterations how many inherited levels you want to check fields for
    * @param match the String to match fields against
-   * @param ignoreField fieldNames you wish to ignore, you can give as many as you like, you can also give an
-   * array of strings
+   * @param ignoreField fieldNames you wish to ignore, you can give as many as you like, you can also give an array of
+   * strings
    * @return whether the given object contained fields which matched the given string
    */
   public static boolean matches(Object object, Class klass, int iterations, String match, String... ignoreField) {
@@ -169,8 +171,8 @@ public class ReflectionHelper {
   }
 
   /**
-   * Checks first whether it is primitive and then whether it's wrapper is a primitive wrapper. Returns true
-   * if either is true
+   * Checks first whether it is primitive and then whether it's wrapper is a primitive wrapper. Returns true if either
+   * is true
    *
    * @param c the class to check whether it's primitive
    * @return whether it's a primitive type itself or it's a wrapper for a primitive type
