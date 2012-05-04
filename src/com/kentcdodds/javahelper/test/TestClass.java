@@ -22,7 +22,6 @@ public class TestClass {
 
   public static void main(String[] args) throws Exception {
     setStuff();
-    resizeImage();
     //    List<File>[] replaced = IOHelper.replaceInAllFiles(new File("C:\\Users\\Kent\\Documents\\My Dropbox\\Work\\MGF\\NetBeansProjects\\MyVideoFacilitator\\src"),
     //            5, "org/mvf/resources/", "/org/mvf/resources/");
     //    PrinterHelper.setInstancePrint(true);
