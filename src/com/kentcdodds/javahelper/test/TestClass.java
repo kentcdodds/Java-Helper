@@ -1,6 +1,6 @@
 package com.kentcdodds.javahelper.test;
 
-import model.Email;
+import com.kentcdodds.javahelper.model.Email;
 import com.kentcdodds.javahelper.helpers.*;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
@@ -18,7 +18,7 @@ import javax.mail.internet.MimeBodyPart;
 import javax.swing.ImageIcon;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
-import model.EmailAttachment;
+import com.kentcdodds.javahelper.model.EmailAttachment;
 
 /**
  *

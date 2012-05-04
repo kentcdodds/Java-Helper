@@ -1,4 +1,4 @@
-package model;
+package com.kentcdodds.javahelper.model;
 
 import com.kentcdodds.javahelper.helpers.IOHelper;
 import java.io.File;
