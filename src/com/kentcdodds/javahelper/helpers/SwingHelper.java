@@ -22,6 +22,7 @@ public class SwingHelper {
    */
   private static int wordWrapChars = 50;
 
+  //<editor-fold defaultstate="collapsed" desc="Window size/position Methods">
   /**
    * This method packs, sets the size, and sets the position of the window given
    *
@@ -36,23 +37,25 @@ public class SwingHelper {
   }
 
   /**
-   * this method maximizes the given item
+   * Maximizes the given JFrame
    *
    * @param frame
    */
   public static void maximizeWindow(JFrame frame) {
     frame.setExtendedState(frame.getExtendedState() | JFrame.MAXIMIZED_BOTH);
   }
+  //</editor-fold>
 
+  //<editor-fold defaultstate="collapsed" desc="Resize Image Methods">
   /**
-  * This method resizes the given image using Image.SCALE_SMOOTH.
-  *
-  * @param image the image to be resized
-  * @param width the desired width of the new image. Negative values force the only constraint to be height.
-  * @param height the desired height of the new image. Negative values force the only constraint to be width.
-  * @param max if true, sets the width and height as maximum heights and widths, if false, they are minimums.
-  * @return the resized image.
-  */
+   * This method resizes the given image using Image.SCALE_SMOOTH.
+   *
+   * @param image the image to be resized
+   * @param width the desired width of the new image. Negative values force the only constraint to be height.
+   * @param height the desired height of the new image. Negative values force the only constraint to be width.
+   * @param max if true, sets the width and height as maximum heights and widths, if false, they are minimums.
+   * @return the resized image.
+   */
   public static Image resizeImage(Image image, int width, int height, boolean max) {
     if (width < 0 && height > 0) {
       return resizeImageBy(image, height, false);
@@ -81,13 +84,13 @@ public class SwingHelper {
   }
 
   /**
-  * Resizes the given image using Image.SCALE_SMOOTH.
-  *
-  * @param image the image to be resized
-  * @param size the size to resize the width/height by (see setWidth)
-  * @param setWidth whether the size applies to the height or to the width
-  * @return the resized image
-  */
+   * Resizes the given image using Image.SCALE_SMOOTH.
+   *
+   * @param image the image to be resized
+   * @param size the size to resize the width/height by (see setWidth)
+   * @param setWidth whether the size applies to the height or to the width
+   * @return the resized image
+   */
   public static Image resizeImageBy(Image image, int size, boolean setWidth) {
     if (setWidth) {
       return image.getScaledInstance(size, -1, Image.SCALE_SMOOTH);
@@ -95,22 +98,76 @@ public class SwingHelper {
       return image.getScaledInstance(-1, size, Image.SCALE_SMOOTH);
     }
   }
-  
+
+  /**
+   * Convenience method. Creates a BufferedImage from the given file location and returns resizeImage(image,
+   * width, height, max).
+   *
+   * @param location the location of the image
+   * @param width the desired width of the new image. Negative values force the only constraint to be height.
+   * @param height the desired height of the new image. Negative values force the only constraint to be width.
+   * @param max if true, sets the width and height as maximum heights and widths, if false, they are minimums.
+   * @return the resized image.
+   * @throws IOException when trying to load a file from the given location
+   */
   public static Image resizeImageFromFile(String location, int width, int height, boolean max) throws IOException {
     BufferedImage image = ImageIO.read(new File(location));
     return resizeImage(image, width, height, max);
   }
-  
+
+  /**
+   * Resizes the given image using Image.SCALE_SMOOTH.
+   *
+   * @param location the location of the image
+   * @param size the size to resize the width/height by (see setWidth)
+   * @param setWidth whether the size applies to the height or to the width
+   * @return the resized image
+   * @throws IOException when loading the image from the file
+   */
+  public static Image resizeImageFromFileBy(String location, int size, boolean setWidth) throws IOException {
+    BufferedImage image = ImageIO.read(new File(location));
+    return resizeImageBy(image, size, setWidth);
+  }
+
+  /**
+   * Convenience method. Creates a BufferedImage from the given resource location (respective to the given
+   * class) and returns resizeImage(image, width, height, max).
+   *
+   * @param klass the class to get the resource from
+   * @param location the location of the resource respective to the class
+   * @param width the desired width of the new image. Negative values force the only constraint to be height.
+   * @param height the desired height of the new image. Negative values force the only constraint to be width.
+   * @param max if true, sets the width and height as maximum heights and widths, if false, they are minimums.
+   * @return the resized image.
+   * @throws IOException
+   */
   public static Image resizeImageFromResource(Class klass, String location, int width, int height, boolean max) throws IOException {
     BufferedImage image = ImageIO.read(klass.getResource(location));
     return resizeImage(image, width, height, max);
   }
 
   /**
-   * this method adds a given image to the bottom right of the layout
+   * Resizes the given image using Image.SCALE_SMOOTH.
    *
-   * @param container where you want the object
-   * @param image
+   * @param klass the class to get the resource relative of
+   * @param location the location of the resource to be resized
+   * @param size the size to resize the width/height by (see setWidth)
+   * @param setWidth whether the size applies to the height or to the width
+   * @return the resized image
+   * @throws IOException when reading the resource
+   */
+  public static Image resizeImageFromResourceBy(Class klass, String location, int size, boolean setWidth) throws IOException {
+    BufferedImage image = ImageIO.read(klass.getResource(location));
+    return resizeImageBy(image, size, setWidth);
+  }
+  //</editor-fold>
+
+  //<editor-fold defaultstate="collapsed" desc="Add Image Methods">
+  /**
+   * Adds a given image to the specified side of the given container
+   *
+   * @param container where you want the image
+   * @param image the image to add
    * @param setWidth if true will set the width as the given size, if false, will set the height as the given
    * size
    * @param size 0 - 4 is smallest to biggest
@@ -119,8 +176,6 @@ public class SwingHelper {
    */
   public static void addImage(Container container, Image image, boolean setWidth, int size, int anchor, boolean bottom) {
     GridBagLayout gbl = (java.awt.GridBagLayout) container.getLayout();
-    JPanel logoPanel = new JPanel();
-    logoPanel.setLayout(new java.awt.GridBagLayout());
     int[][] dim = gbl.getLayoutDimensions();
     int cols = dim[0].length;
     int rows = dim[1].length;
@@ -136,7 +191,6 @@ public class SwingHelper {
     }
     gridBagConstraints.anchor = anchor;
     gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 10);
-    container.add(logoPanel, gridBagConstraints);
     JLabel logo = new JLabel();
     ImageIcon newImage;
     if (setWidth) {
@@ -145,10 +199,49 @@ public class SwingHelper {
       newImage = new ImageIcon(resizeImage(image, -1, size, true));
     }
     logo.setIcon(newImage);
-    logoPanel.add(logo);
+    container.add(logo, gridBagConstraints);
   }
 
   /**
+   * Convenience method.
+   *
+   * @param container where you want the image
+   * @param location the location of the file
+   * @param setWidth if true will set the width as the given size, if false, will set the height as the given
+   * size
+   * @param size 0 - 4 is smallest to biggest
+   * @param anchor use java.awt.GridBagConstraints.CENTER (for example)
+   * @param bottom if true, image will appear on the bottom, if false, image will appear on the right.
+   * @throws IOException
+   */
+  public static void addImageFromFile(Container container, String location, boolean setWidth, int size, int anchor, boolean bottom) throws IOException {
+    BufferedImage image = ImageIO.read(new File(location));
+    addImage(container, image, setWidth, size, anchor, bottom);
+  }
+
+  /**
+   * Convenience method.
+   *
+   * @param klass the class to get the resource from
+   * @param container where you want the image
+   * @param location the location of the resource with respect to the given class
+   * @param setWidth if true will set the width as the given size, if false, will set the height as the given
+   * size
+   * @param size 0 - 4 is smallest to biggest
+   * @param anchor use java.awt.GridBagConstraints.CENTER (for example)
+   * @param bottom if true, image will appear on the bottom, if false, image will appear on the right.
+   * @throws IOException
+   */
+  public static void addImageFromResource(Class klass, Container container, String location, boolean setWidth, int size, int anchor, boolean bottom) throws IOException {
+    BufferedImage image = ImageIO.read(klass.getResource(location));
+    addImage(container, image, setWidth, size, anchor, bottom);
+  }
+  //</editor-fold>
+
+  //<editor-fold defaultstate="collapsed" desc="Other Methods">
+  /**
+   * Gets the top parent Window of the given component. There is a limit to how far up the parent stack it'll
+   * go.
    *
    * @param <T>
    * @param jComponent
@@ -157,7 +250,7 @@ public class SwingHelper {
   public static <T extends Window> T getParentWindow(Component jComponent) {
     Container parent = jComponent.getParent();
     int i = 0;
-    int limit = 20;
+    int limit = 100;
     while (true) {
       parent = parent.getParent();
       if (parent instanceof Window) {
@@ -170,6 +263,31 @@ public class SwingHelper {
     }
   }
 
+  /**
+   * Returns a window with a partially opaque progress Icon
+   *
+   * @param icon the icon to set in the progress window
+   * @return a jWindow of the progress wheel
+   */
+  public static JWindow getProgressWheelWindow(final Icon icon) {
+    JWindow jWindow = new JWindow() {
+
+      {
+        setOpacity(.842f);
+        setLocation(0, 0);
+        setSize(icon.getIconWidth(), icon.getIconHeight());
+        add(new JLabel(icon));
+        pack();
+      }
+    };
+
+    centerAndPack(jWindow);
+
+    return jWindow;
+  }
+  //</editor-fold>
+
+  //<editor-fold defaultstate="collapsed" desc="File Open, Save, and Folder Choose Methods">
   /**
    * This method will allow for the saving of files
    *
@@ -252,7 +370,9 @@ public class SwingHelper {
     }
     return null;
   }
+  //</editor-fold>
 
+  //<editor-fold defaultstate="collapsed" desc="JOptionPane Methods">
   /**
    * Convenience Method: Calls StringHelper.wordWrappedMessage(message, getWordWrapChars()). A method like
    * this allows you to keep everything standard for JOptionPane messages
@@ -289,7 +409,9 @@ public class SwingHelper {
     message += (decimal) ? ".45" : StringHelper.newline + "(Note, no decimal).";
     showErrorMessage(parent, message);
   }
+  //</editor-fold>
 
+  //<editor-fold defaultstate="collapsed" desc="Look and Feel (and color) Methods">
   /**
    * Set the System look and feel to the System standard
    */
@@ -335,30 +457,9 @@ public class SwingHelper {
       }
     }
   }
+  //</editor-fold>
 
-  /**
-   * Returns a window with a partially opaque progress Icon
-   *
-   * @param icon the icon to set in the progress window
-   * @return a jWindow of the progress wheel
-   */
-  public static JWindow getProgressWheelWindow(final Icon icon) {
-    JWindow jWindow = new JWindow() {
-
-      {
-        setOpacity(.842f);
-        setLocation(0, 0);
-        setSize(icon.getIconWidth(), icon.getIconHeight());
-        add(new JLabel(icon));
-        pack();
-      }
-    };
-
-    centerAndPack(jWindow);
-
-    return jWindow;
-  }
-
+  //<editor-fold defaultstate="collapsed" desc="Getters and Setters">
   /**
    * @return the wordWrapChars. This is the number of characters to wrap JOptionPane messages with when you
    * call wordWrappedMessage(String message)
@@ -374,4 +475,5 @@ public class SwingHelper {
   public static void setWordWrapChars(int aWordWrapChars) {
     wordWrapChars = aWordWrapChars;
   }
+  //</editor-fold>
 }
