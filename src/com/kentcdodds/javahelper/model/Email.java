@@ -2,14 +2,8 @@ package com.kentcdodds.javahelper.model;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.activation.DataHandler;
-import javax.activation.DataSource;
-import javax.activation.FileDataSource;
-import javax.mail.Message;
 import javax.mail.MessagingException;
-import javax.mail.Part;
 import javax.mail.internet.MimeBodyPart;
-import javax.mail.util.ByteArrayDataSource;
 
 /**
  *
@@ -17,10 +11,10 @@ import javax.mail.util.ByteArrayDataSource;
  */
 public class Email {
 
-  private String from;
-  private List<String> to;
-  private List<String> cc;
-  private List<String> bcc;
+  private String from = "";
+  private List<String> to = new ArrayList<>();
+  private List<String> cc = new ArrayList<>();
+  private List<String> bcc = new ArrayList<>();
   private String subject = "";
   private String body = "";
   private List<MimeBodyPart> bodyParts = new ArrayList<>();
@@ -33,11 +27,31 @@ public class Email {
   }
 
   /**
+   * Convenience Constructor: The bare minimum information you need to send an e-mail.
+   *
+   * @param from 
+   * @param to 
+   * @param body 
+   * @param subject 
+   */
+  public Email(String from, String to, String subject, String body) {
+    this.from = from;
+    this.to.add(to);
+    this.subject = subject;
+    this.body = body;
+  }
+
+  /**
    * Constructor: Use for e-mails without attachments
    *
-   * @throws MessagingException when trying to add the body to the message
+   * @param from 
+   * @param to 
+   * @param body 
+   * @param cc 
+   * @param bcc 
+   * @param subject 
    */
-  public Email(String from, List<String> to, List<String> cc, List<String> bcc, String subject, String body) throws MessagingException {
+  public Email(String from, List<String> to, List<String> cc, List<String> bcc, String subject, String body) {
     this.from = from;
     this.to = to;
     this.cc = cc;
@@ -47,7 +61,14 @@ public class Email {
   }
 
   /**
-   * Constructor: Use for e-mails with attachments (the message should be included in the body parts)
+   * Constructor: Use for e-mails with attachments
+   * @param from
+   * @param to 
+   * @param bodyParts
+   * @param cc 
+   * @param subject
+   * @param bcc
+   * @param body  
    */
   public Email(String from, List<String> to, List<String> cc, List<String> bcc, String subject, String body, List<MimeBodyPart> bodyParts) {
     this.from = from;
@@ -66,27 +87,16 @@ public class Email {
    *
    * @param attachment
    * @return whether the attachment was successfully added to the bodyParts list
+   * @throws MessagingException  
    */
   public boolean addEmailAttachment(EmailAttachment attachment) throws MessagingException {
-    DataSource source;
-    if (attachment.getFileBytes() != null) {
-      source = new ByteArrayDataSource(attachment.getFileBytes(), Message.ATTACHMENT);
-    } else if (attachment.getFile() != null) {
-      source = new FileDataSource(attachment.getFile()) {
-
-        @Override
-        public String getContentType() {
-          return "application/octet-stream";
-        }
-      };
-    } else {
-      return false;
+    if (attachment.getBodyPart() == null) {
+      boolean success = attachment.generateMimeBodyPart();
+      if (!success) {
+        return false;
+      }
     }
-    MimeBodyPart messageBodyPart = new MimeBodyPart();
-
-    messageBodyPart.setDataHandler(new DataHandler(source));
-    messageBodyPart.setFileName(attachment.getFullFilename());
-    bodyParts.add(messageBodyPart);
+    bodyParts.add(attachment.getBodyPart());
     return true;
   }
 
@@ -189,4 +199,5 @@ public class Email {
     this.body = body;
   }
   //</editor-fold>
+
 }

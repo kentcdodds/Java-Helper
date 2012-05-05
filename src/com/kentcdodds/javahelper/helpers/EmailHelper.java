@@ -21,15 +21,13 @@ public class EmailHelper {
 
   /**
    * Convenience method. Sends an e-mail using the javax.mail Library with the given service (EmailHelper.GOOGLE_APPS
-   * for example). If EmailHelper.LDS_CHURCH is used, username and password can be null
+   * for example). In some cases which don't require authentication, null may be used for username and password.
    *
-   * @param fromAddress
-   * @param destinationAddress
-   * @param username
-   * @param password for the from address
-   * @param subject
-   * @param content
-   * @throws MessagingException
+   * @param service an integer representing the service you wish to send the e-mail with. Like EmailHelper.GOOGLE_APPS.
+   * @param email the e-mail to send
+   * @param username the username for authentication
+   * @param password the password for authentication
+   * @throws MessagingException when trying 
    */
   public static void sendEmail(int service, Email email, final String username, final String password) throws MessagingException {
     Session session = null;
@@ -38,7 +36,6 @@ public class EmailHelper {
         session = getGoogleSession(username, password);
         break;
     }
-
     sendEmail(session, email);
   }
 
