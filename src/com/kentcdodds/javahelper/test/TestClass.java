@@ -1,12 +1,12 @@
 package com.kentcdodds.javahelper.test;
 
-import com.kentcdodds.javahelper.model.Email;
 import com.kentcdodds.javahelper.helpers.*;
+import com.kentcdodds.javahelper.model.Email;
+import com.kentcdodds.javahelper.model.EmailAttachment;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -14,11 +14,9 @@ import java.util.Date;
 import java.util.List;
 import javax.imageio.ImageIO;
 import javax.mail.MessagingException;
-import javax.mail.internet.MimeBodyPart;
 import javax.swing.ImageIcon;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
-import com.kentcdodds.javahelper.model.EmailAttachment;
 
 /**
  *
@@ -30,7 +28,9 @@ public class TestClass {
   
   public static void main(String[] args) throws Exception {
     setStuff();
-    email();
+    String st = "This is a test. I hope this works!";
+    IOHelper.saveBytesToFile(st.getBytes(), "C:\\Users\\kentcdodds\\tester.txt");
+//    email();
     //    List<File>[] replaced = IOHelper.replaceInAllFiles(new File("C:\\Users\\Kent\\Documents\\My Dropbox\\Work\\MGF\\NetBeansProjects\\MyVideoFacilitator\\src"),
     //            5, "org/mvf/resources/", "/org/mvf/resources/");
     //    PrinterHelper.setInstancePrint(true);

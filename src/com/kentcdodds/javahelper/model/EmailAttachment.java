@@ -19,7 +19,7 @@ import javax.mail.util.ByteArrayDataSource;
 public class EmailAttachment {
 
   private File file;
-  private byte[] fileBytes;
+  private byte[] fileBytes = new byte[0];
   private String fileName;
   private String extension;
   private String fullFileName;
@@ -65,7 +65,13 @@ public class EmailAttachment {
   public boolean generateMimeBodyPart() throws MessagingException {
     DataSource source;
     if (fileBytes != null) {
-      source = new ByteArrayDataSource(fileBytes, Message.ATTACHMENT);
+      source = new ByteArrayDataSource(fileBytes, Message.ATTACHMENT) {
+        
+        @Override
+        public String getContentType() {
+          return "application/octet-stream";
+        }
+      };
     } else if (file != null) {
       source = new FileDataSource(file) {
 

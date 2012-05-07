@@ -181,6 +181,7 @@ public class IOHelper {
    */
   public static byte[] getFileBytes(File file) throws FileNotFoundException, IOException, Exception {
     HelperFile helperFile = new HelperFile(file);
+    
     return helperFile.getBytes();
   }
 
