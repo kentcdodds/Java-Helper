@@ -39,6 +39,7 @@ public class EmailAttachment {
    */
   public EmailAttachment(byte[] fileBytes, String fullFileName) {
     this.fileBytes = fileBytes;
+    this.fullFileName = fullFileName;
   }
 
   /**
@@ -153,8 +154,9 @@ public class EmailAttachment {
    * @return the file bytes
    * @throws FileNotFoundException if the file does not exist on the system
    * @throws IOException when reading the file
+   * @throws when reading fileBytes
    */
-  public byte[] generateFileBytes() throws FileNotFoundException, IOException {
+  public byte[] generateFileBytes() throws FileNotFoundException, IOException, Exception {
     this.fileBytes = IOHelper.getFileBytes(file);
     return getFileBytes();
   }

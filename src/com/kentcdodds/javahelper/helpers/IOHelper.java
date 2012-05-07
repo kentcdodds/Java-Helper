@@ -1,5 +1,6 @@
 package com.kentcdodds.javahelper.helpers;
 
+import com.kentcdodds.javahelper.model.HelperFile;
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -112,26 +113,40 @@ public class IOHelper {
    *
    * @param klass
    * @param resourceLocation
-   * @param destinationFilepath
+   * @param outputFile
    * @throws FileNotFoundException
    * @throws IOException
    */
-  public static void copyResourceFile(Class klass, String resourceLocation, String destinationFilepath) throws FileNotFoundException, IOException {
-    InputStream inputString = klass.getResourceAsStream(resourceLocation);
-    saveInputStream(inputString, destinationFilepath);
+  public static void copyResourceFile(Class klass, String resourceLocation, File outputFile) throws FileNotFoundException, IOException {
+    InputStream inputStream = klass.getResourceAsStream(resourceLocation);
+    saveInputStream(inputStream, outputFile);
   }
 
   /**
    * Copies the given source to the given destination. Does not check whether the destination exists.
    *
    * @param sourceFilepath
-   * @param destinationFilepath
+   * @param outputFile
    * @throws FileNotFoundException
    * @throws IOException
    */
-  public static void copyFile(String sourceFilepath, String destinationFilepath) throws FileNotFoundException, IOException {
-    InputStream is = new FileInputStream(new File(destinationFilepath));
-    saveInputStream(is, destinationFilepath);
+  public static void copyFile(File sourceFile, File outputFile) throws FileNotFoundException, IOException {
+    InputStream inputStream = new FileInputStream(sourceFile);
+    saveInputStream(inputStream, outputFile);
+  }
+
+  /**
+   * Saves the given bytes to the output file. Creates a HelperFile with the given bytes and location then calls
+   * saveBytes() on it.
+   *
+   * @param bytes
+   * @param outputFile
+   * @throws FileNotFoundException
+   * @throws IOException
+   */
+  public static void saveBytesToFile(byte[] bytes, String location) throws FileNotFoundException, IOException {
+    HelperFile helperFile = new HelperFile(bytes, location);
+    helperFile.saveBytes();
   }
 
   /**
@@ -142,10 +157,10 @@ public class IOHelper {
    * @throws FileNotFoundException
    * @throws IOException
    */
-  public static void saveInputStream(InputStream inputStream, String destination) throws FileNotFoundException, IOException {
-    File outputFile = new File(destination);
+  public static void saveInputStream(InputStream inputStream, File outputFile) throws FileNotFoundException, IOException {
+    int size = 4096;
     try (OutputStream out = new FileOutputStream(outputFile)) {
-      byte[] buffer = new byte[1024];
+      byte[] buffer = new byte[size];
       int length;
       while ((length = inputStream.read(buffer)) > 0) {
         out.write(buffer, 0, length);
@@ -156,32 +171,17 @@ public class IOHelper {
 
   /**
    * Reads the given bytes into an array. The bytes must not exceed the array size limit of Integer.MAX_VALUE (which is
-   * 2^31 -1). This means you can only use this method with files under 2 megabytes
+   * 2^31 -1). This means you can only use this method with files under 2 gigabytes
    *
    * @param file
    * @return
-   * @throws FileNotFoundException
-   * @throws IOException
+   * @throws FileNotFoundException when trying to get the file
+   * @throws IOException when trying to read the file
+   * @throws Exception when trying to read a file too big for a byte[]
    */
-  public static byte[] getFileBytes(File file) throws FileNotFoundException, IOException {
-    byte[] bytes;
-    try (InputStream inputStream = new FileInputStream(file)) {
-      long length = file.length();
-      if (length > Integer.MAX_VALUE) {
-        throw new IOException("The file is too large to be read into an array");
-      }
-      bytes = new byte[(int) length];
-      int offset = 0;
-      int numRead = 0;
-      while (offset < bytes.length
-              && (numRead = inputStream.read(bytes, offset, bytes.length - offset)) >= 0) {
-        offset += numRead;
-      }
-      if (offset < bytes.length) {
-        throw new IOException("Could not completely read file " + file.getName());
-      }
-    }
-    return bytes;
+  public static byte[] getFileBytes(File file) throws FileNotFoundException, IOException, Exception {
+    HelperFile helperFile = new HelperFile(file);
+    return helperFile.getBytes();
   }
 
   /**
