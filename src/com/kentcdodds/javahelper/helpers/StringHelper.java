@@ -66,7 +66,7 @@ public class StringHelper {
    * @return
    */
   public static boolean isNullOrEmpty(String... string) {
-    if (OtherHelper.isNull((Object) string)) {
+    if (OtherHelper.isNull((Object[]) string)) {
       return true;
     }
     return isEmpty(string);
