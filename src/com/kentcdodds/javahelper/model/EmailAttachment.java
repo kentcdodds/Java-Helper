@@ -19,7 +19,7 @@ import javax.mail.util.ByteArrayDataSource;
 public class EmailAttachment {
 
   private File file;
-  private byte[] fileBytes = new byte[0];
+  private byte[] fileBytes;
   private String fileName;
   private String extension;
   private String fullFileName;
