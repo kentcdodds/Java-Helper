@@ -72,7 +72,6 @@ public class EmailHelper {
    * @throws MessagingException
    */
   public static void sendEmail(Session session, Email email) throws MessagingException {
-    session.setDebug(true);
     Message message = new MimeMessage(session);
 
     //Set participants
