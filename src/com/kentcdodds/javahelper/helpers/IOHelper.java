@@ -137,10 +137,10 @@ public class IOHelper {
 
   /**
    * Saves the given bytes to the output file. Creates a HelperFile with the given bytes and location then calls
-   * saveBytes() on it.
+   * copyBytes() on it.
    *
    * @param bytes
-   * @param outputFile
+   * @param location 
    * @throws FileNotFoundException
    * @throws IOException
    */

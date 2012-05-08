@@ -1,5 +1,6 @@
 package com.kentcdodds.javahelper.model;
 
+import com.kentcdodds.javahelper.helpers.IOHelper;
 import java.io.*;
 
 /**
@@ -12,14 +13,25 @@ public class HelperFile extends File {
 
   /**
    * Constructor for HelperFile
+   *
+   * @param path the path to the file
+   * @throws FileNotFoundException when trying to read the file
+   * @throws IOException when trying to read the bytes into the byte[]
+   * @throws Exception when trying to read the bytes into the array
    */
-  public HelperFile(String location) throws FileNotFoundException, IOException, Exception {
-    super(location);
+  public HelperFile(String path) throws FileNotFoundException, IOException, Exception {
+    super(path);
     generateBytes();
   }
 
   /**
-   * Constructor for HelperFile
+   * Convenience constructor. Just gets the path of the file and does the exact same thing as the constructor
+   * requiring a path
+   *
+   * @param file getPath is called in super()
+   * @throws FileNotFoundException when trying to read the file
+   * @throws IOException when trying to read the bytes into the byte[]
+   * @throws Exception when trying to read the bytes into the array
    */
   public HelperFile(File file) throws FileNotFoundException, IOException, Exception {
     super(file.getPath());
@@ -48,7 +60,7 @@ public class HelperFile extends File {
     bytes = new byte[(int) length()];
     stream.read(bytes);
   }
-  
+
   /**
    * Saves the bytes in this HelperFile to the location in this HelperFile
    *
@@ -62,16 +74,17 @@ public class HelperFile extends File {
   }
 
   /**
-   * Saves the bytes in this HelperFile to the location specified
+   * Copies this file's bytes to the given file path. Calls IOHelper.saveBytesToFile(bytes, file.getPath());
    *
+   * @param file the location of the file.
    * @throws FileNotFoundException if the file cannot be found
    * @throws IOException when writing the bytes to the disk
    */
-  public void saveBytes(File file) throws FileNotFoundException, IOException {
-    BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(file));
-    out.write(bytes);
+  public void copyBytes(File file) throws FileNotFoundException, IOException {
+    IOHelper.saveBytesToFile(bytes, file.getPath());
   }
 
+  //<editor-fold defaultstate="collapsed" desc="Getters and Setters">
   /**
    * @return the bytes
    */
@@ -85,4 +98,5 @@ public class HelperFile extends File {
   public void setBytes(byte[] bytes) {
     this.bytes = bytes;
   }
+  //</editor-fold>
 }
