@@ -7,15 +7,15 @@ package com.kentcdodds.javahelper.helpers;
 public class StringHelper {
 
   /**
-   * System.getProperty("line.separator"); This way you can make sure you have the right newline character
-   * regardless of the system the user is using.
+   * System.getProperty("line.separator"); This way you can make sure you have the right newline character regardless of
+   * the system the user is using.
    */
   public static final String newline = System.getProperty("line.separator");
 
   /**
-   * Performs a wordwrap-like function on the given string limiting the line length to the given lineLimit.
-   * The lineLimit starts over based on the paragraph. It is defined by the
-   * System.getProperty("line.separator"). Words are defined by spaces.
+   * Performs a wordwrap-like function on the given string limiting the line length to the given lineLimit. The
+   * lineLimit starts over based on the paragraph. It is defined by the System.getProperty("line.separator"). Words are
+   * defined by spaces.
    *
    * @param string
    * @param lineLimit
@@ -59,8 +59,8 @@ public class StringHelper {
   }
 
   /**
-   * Calls isNull from OtherHelper on the given parameters first, then calls isEmpty on them. Returns true on
-   * first true result
+   * Calls isNull from OtherHelper on the given parameters first, then calls isEmpty on them. Returns true on first true
+   * result
    *
    * @param string the string/strings/array of strings to check
    * @return
@@ -89,9 +89,9 @@ public class StringHelper {
 
   /**
    * Will insert the given inserts between each character of the given string. Here's an example:
-   * insertIntoString("1234", "a", "", "c", "+", "-", "32342") would return "a12c3+4".
-   * insertIntoString("1234", "", "hello", "", "world") would return "1hello23world4". Or a more useful
-   * example: insertIntoString("1231234567", "(", "", "", ") ", "", "", "-") would return "(123) 123-4567"
+   * insertIntoString("1234", "a", "", "c", "+", "-", "32342") would return "a12c3+4". insertIntoString("1234", "",
+   * "hello", "", "world") would return "1hello23world4". Or a more useful example: insertIntoString("1231234567", "(",
+   * "", "", ") ", "", "", "-") would return "(123) 123-4567"
    *
    * @param string
    * @param inserts
@@ -130,8 +130,20 @@ public class StringHelper {
   }
 
   /**
-   * Separates the given strings with the given separator (", " for example). Does not add the separator to
-   * the end of the list
+   * Convenience method. Allows you to give the splitBy method a list rather than an array or comma separated
+   * parameters.
+   *
+   * @param separator
+   * @param strings
+   * @return
+   */
+  public static String splitBy(String separator, java.util.List<String> strings) {
+    return splitBy(separator, new String[strings.size()]);
+  }
+
+  /**
+   * Separates the given strings with the given separator (", " for example). Does not add the separator to the end of
+   * the list
    *
    * @param separator
    * @param strings
