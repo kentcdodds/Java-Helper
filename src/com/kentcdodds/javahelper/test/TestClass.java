@@ -14,6 +14,7 @@ import java.util.Date;
 import java.util.List;
 import javax.imageio.ImageIO;
 import javax.mail.MessagingException;
+import javax.mail.Session;
 import javax.swing.ImageIcon;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
@@ -28,9 +29,7 @@ public class TestClass {
   
   public static void main(String[] args) throws Exception {
     setStuff();
-    String st = "This is a test. I hope this works!";
-    IOHelper.saveBytesToFile(st.getBytes(), "C:\\Users\\kentcdodds\\tester.txt");
-//    email();
+    email();
     //    List<File>[] replaced = IOHelper.replaceInAllFiles(new File("C:\\Users\\Kent\\Documents\\My Dropbox\\Work\\MGF\\NetBeansProjects\\MyVideoFacilitator\\src"),
     //            5, "org/mvf/resources/", "/org/mvf/resources/");
     //    PrinterHelper.setInstancePrint(true);
@@ -39,19 +38,22 @@ public class TestClass {
   }
   
   public static void email() throws MessagingException {
-    String from = "test@example.org";
+    String from = "from";
     List<String> to = new ArrayList<>();
     to.add("dfkewofds@mailinator.com");
     List<String> cc = new ArrayList<>();
     cc.add("dfkefofds@mailinator.com");
     List<String> bcc = new ArrayList<>();
-    bcc.add("me@kentcdodds.com");
+    bcc.add("gfdjakl@mailinator.com");
     String subject = "This is a test subject!";
     Email email = new Email(from, to, cc, bcc, subject, "This is the message!");
     EmailAttachment attachment = new EmailAttachment();
-    attachment.setFile(new File("C:\\Users\\kentcdodds\\Documents\\test attachment.txt"));
+//    attachment.setFile(new File("C:\\Users\\kentcdodds\\Documents\\test attachment.txt"));
+    attachment.setFile(new File("C:\\Users\\Kent\\test.txt"));
     email.addEmailAttachment(attachment);
-    EmailHelper.sendEmail(EmailHelper.getGoogleSession("tester", "yourpassword"), email);
+    Session session = EmailHelper.getYahooSession("yahoo_user", "yahoo_password");
+    session.setDebug(true);
+    EmailHelper.sendEmail(session, email);
 //    System.out.println(ReflectionHelper.getObjectInString(email, true, 1, true, 1));
     System.out.println("Email sent!");
   }

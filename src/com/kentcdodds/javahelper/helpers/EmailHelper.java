@@ -18,29 +18,39 @@ import com.kentcdodds.javahelper.model.Email;
 public class EmailHelper {
 
   public static final int GOOGLE_APPS = 123;
+  public static final int LIVE = 124;
+  public static final int YAHOO = 125;
 
   /**
-   * Convenience method. Sends an e-mail using the javax.mail Library with the given service (EmailHelper.GOOGLE_APPS
-   * for example). In some cases which don't require authentication, null may be used for username and password.
+   * Convenience method. Sends an e-mail using the javax.mail Library with the given service
+   * (EmailHelper.GOOGLE_APPS for example). In some cases which don't require authentication, null may be used
+   * for username and password.
    *
-   * @param service an integer representing the service you wish to send the e-mail with. Like EmailHelper.GOOGLE_APPS.
+   * @param service an integer representing the service you wish to send the e-mail with. Like
+   * EmailHelper.GOOGLE_APPS.
    * @param email the e-mail to send
    * @param username the username for authentication
    * @param password the password for authentication
-   * @throws MessagingException when trying 
+   * @throws MessagingException when trying
    */
-  public static void sendEmail(int service, Email email, final String username, final String password) throws MessagingException {
+  public static void sendEmail(int service, final String username, final String password, Email email) throws MessagingException {
     Session session = null;
     switch (service) {
       case GOOGLE_APPS:
         session = getGoogleSession(username, password);
+        break;
+      case LIVE:
+        session = getLiveSession(username, password);
+        break;
+      case YAHOO:
+        session = getYahooSession(username, password);
         break;
     }
     sendEmail(session, email);
   }
 
   /**
-   * Gets a javax.mail.Session for Google apps and Gmail
+   * Gets a javax.mail.Session for Google apps and Gmail. When you send your e-mail, the from address will be forced to the username you give here.
    *
    * @param username
    * @param password
@@ -54,14 +64,60 @@ public class EmailHelper {
     properties.put("mail.smtp.auth", "true");
     properties.put("mail.smtp.port", "465");
 
-    Session session = Session.getInstance(properties, new javax.mail.Authenticator() {
+    return Session.getInstance(properties, new javax.mail.Authenticator() {
 
       @Override
       protected PasswordAuthentication getPasswordAuthentication() {
         return new PasswordAuthentication(username, password);
       }
     });
-    return session;
+  }
+
+  /**
+   * Gets a javax.mail.Session for MSN/LIVE/HOTMAIL. When you send your e-mail, the from address will be forced to the username you give here.
+   *
+   * @param username
+   * @param password
+   * @return
+   */
+  public static Session getLiveSession(final String username, final String password) {
+    Properties properties = new Properties();
+    properties.setProperty("mail.transport.protocol", "smtp");
+    properties.setProperty("mail.host", "smtp.live.com");
+    properties.put("mail.smtp.starttls.enable", "true");
+    properties.put("mail.smtp.auth", "true");
+
+    return Session.getInstance(properties, new javax.mail.Authenticator() {
+
+      @Override
+      protected PasswordAuthentication getPasswordAuthentication() {
+        return new PasswordAuthentication(username, password);
+      }
+    });
+  }
+
+  /**
+   * Gets a javax.mail.Session for Yahoo! When you send your e-mail, the from address must be the same as the
+   * address you've signed into here or you'll get this error: com.sun.mail.smtp.SMTPSendFailedException: 553
+   * From address not verified...
+   *
+   * @param username
+   * @param password
+   * @return
+   */
+  public static Session getYahooSession(final String username, final String password) {
+    Properties properties = new Properties();
+    properties.setProperty("mail.transport.protocol", "smtp");
+    properties.put("mail.smtp.host", "smtp.mail.yahoo.com");
+    properties.put("mail.smtp.auth", "true");
+    properties.put("mail.smtp.starttls.enable", "true");
+    return Session.getDefaultInstance(properties, new Authenticator() {
+
+      @Override
+      protected PasswordAuthentication getPasswordAuthentication() {
+        return new PasswordAuthentication(username, password);
+      }
+    });
   }
 
   /**
@@ -100,7 +156,7 @@ public class EmailHelper {
       multipart.addBodyPart(mimeBodyPart);
     }
     message.setContent(multipart);
-    
+
     //Send the message
     Transport.send(message);
   }
