@@ -21,6 +21,7 @@ public class EmailAttachment {
   private File file;
   private byte[] fileBytes;
   private String fileName;
+  private String attachmentName;
   private String extension;
   private String fullFileName;
   private MimeBodyPart bodyPart;
@@ -85,7 +86,7 @@ public class EmailAttachment {
     }
     bodyPart = new MimeBodyPart();
     bodyPart.setDataHandler(new DataHandler(source));
-    bodyPart.setFileName(getFullFileName());
+    bodyPart.setFileName(getAttachmentName());
     return true;
   }
 
@@ -207,5 +208,22 @@ public class EmailAttachment {
    */
   public void setBodyPart(MimeBodyPart bodyPart) {
     this.bodyPart = bodyPart;
+  }
+
+  /**
+   * @return the attachmentName. Sets it to getFullFileName() if attachmentName is null
+   */
+  public String getAttachmentName() {
+    if (attachmentName == null) {
+      attachmentName = getFullFileName();
+    }
+    return attachmentName;
+  }
+
+  /**
+   * @param attachmentName the attachmentName to set
+   */
+  public void setAttachmentName(String attachmentName) {
+    this.attachmentName = attachmentName;
   }
 }
