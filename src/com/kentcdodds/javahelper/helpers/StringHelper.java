@@ -138,7 +138,7 @@ public class StringHelper {
    * @return
    */
   public static String splitBy(String separator, java.util.List<String> strings) {
-    return splitBy(separator, new String[strings.size()]);
+    return splitBy(separator, strings.toArray(new String[strings.size()]));
   }
 
   /**
