@@ -53,12 +53,11 @@ public class EmailAttachment {
   }
 
   /**
-   * Generates and sets the MimeBodyPart for this attachment. First checks whether the attachment has bytes
-   * already. This allows you to give an email attachment which has bytes in memory and doesn't have an actual
-   * file. If the bytes are null it reads the bytes from the file. If the file is null returns false.
-   * **Important** Be sure the at least one of the following groups of this Email attachment has been set
-   * before calling this method, otherwise you'll get a null pointer exception: fullFileName, file, or
-   * fileName and extension (both)
+   * Generates and sets the MimeBodyPart for this attachment. First checks whether the attachment has bytes already.
+   * This allows you to give an email attachment which has bytes in memory and doesn't have an actual file. If the bytes
+   * are null it reads the bytes from the file. If the file is null returns false. **Important** Be sure the at least
+   * one of the following groups of this Email attachment has been set before calling this method, otherwise you'll get
+   * a null pointer exception: fullFileName, file, or fileName and extension (both)
    *
    * @return whether the MimeBodyPart was successfully generated
    * @throws MessagingException when setting DataHandler and the filename
@@ -67,7 +66,7 @@ public class EmailAttachment {
     DataSource source;
     if (fileBytes != null) {
       source = new ByteArrayDataSource(fileBytes, Message.ATTACHMENT) {
-        
+
         @Override
         public String getContentType() {
           return "application/octet-stream";
@@ -91,9 +90,23 @@ public class EmailAttachment {
   }
 
   /**
+   * Gets the size of the attachment (from the fileBytes if this is not null, or the file if the file is not null).
+   *
+   * @return
+   */
+  public long getSize() {
+    if (fileBytes != null) {
+      return fileBytes.length;
+    } else if (file != null) {
+      return file.length();
+    }
+    return -1;
+  }
+
+  /**
    * Gets the filename of the attachment ("document.doc" returns "document"). If the fileName is null, calls
-   * generateFileInfo(). Important: If the file of this attachment is null and the fileName has not already
-   * been set, you'll get a null value back.
+   * generateFileInfo(). Important: If the file of this attachment is null and the fileName has not already been set,
+   * you'll get a null value back.
    *
    * @return the filename of the file
    */
@@ -106,8 +119,8 @@ public class EmailAttachment {
 
   /**
    * Gets the extension of the attachment ("document.doc" returns "doc"). If the extension is null, calls
-   * generateFileInfo(). Important: If the file of this attachment is null and the extension has not already
-   * been set, you'll get a null value back.
+   * generateFileInfo(). Important: If the file of this attachment is null and the extension has not already been set,
+   * you'll get a null value back.
    *
    * @return the extension of this EmailAttachment
    */
@@ -119,8 +132,8 @@ public class EmailAttachment {
   }
 
   /**
-   * If the full filename is null, uses file.getName(). If file is null, generates it with getFileName() + "."
-   * + getExtension().
+   * If the full filename is null, uses file.getName(). If file is null, generates it with getFileName() + "." +
+   * getExtension().
    *
    * @return the fullFilename
    */
@@ -136,8 +149,8 @@ public class EmailAttachment {
   }
 
   /**
-   * Generates the file info based on the file or the fullFileName. If the file is null then fullFileName will
-   * be used. If fullFileName is null then nothing will be set.
+   * Generates the file info based on the file or the fullFileName. If the file is null then fullFileName will be used.
+   * If fullFileName is null then nothing will be set.
    */
   public void generateFileInfo() {
     String name;
@@ -154,9 +167,9 @@ public class EmailAttachment {
   }
 
   /**
-   * Generates the bytes of the file from the current file and sets this object's file bytes. WARNING: This
-   * will not work if the file is greater than 2 GB because that's the maximum size of an array. This is
-   * really unlikely to happen for e-mail attachments
+   * Generates the bytes of the file from the current file and sets this object's file bytes. WARNING: This will not
+   * work if the file is greater than 2 GB because that's the maximum size of an array. This is really unlikely to
+   * happen for e-mail attachments
    *
    * @return the file bytes
    * @throws FileNotFoundException if the file does not exist on the system
