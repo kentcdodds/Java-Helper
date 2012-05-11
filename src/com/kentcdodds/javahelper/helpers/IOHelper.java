@@ -186,6 +186,65 @@ public class IOHelper {
     return helperFile.getBytes();
   }
 
+  //<editor-fold defaultstate="collapsed" desc="Zipping methods">
+  /**
+   * Zips the directory to the given destination.
+   *
+   * @param destination
+   * @param directory
+   * @throws FileNotFoundException
+   * @throws IOException
+   */
+  public static void zipFolder(File destination, File directory) throws FileNotFoundException, IOException {
+    try (ZipOutputStream out = new ZipOutputStream(new FileOutputStream(destination))) {
+      addDirectoryToZip(directory, directory.getName(), out);
+    }
+  }
+  
+  /**
+   * Zips the directory to the given destination.
+   *
+   * @param destination
+   * @param directory
+   * @throws FileNotFoundException
+   * @throws IOException
+   */
+  public static byte[] zipFolder(File directory) throws FileNotFoundException, IOException {
+    ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
+    try (ZipOutputStream out = new ZipOutputStream(byteOut)) {
+      addDirectoryToZip(directory, directory.getName(), out);
+    }
+    return byteOut.toByteArray();
+  }
+  
+  /**
+   * Gets the files from the given directory and adds them to the output stream based on the pathToTop variable.
+   *
+   * @param directory the directory to get files from to add to the zip
+   * @param pathToTop the path to the parent of this zip file
+   * @param out the ZipOutputStream to put the files into
+   * @throws IOException
+   */
+  private static void addDirectoryToZip(File directory, String pathToTop, ZipOutputStream out) throws IOException {
+    File[] files = directory.listFiles();
+    byte[] buffer = new byte[1024];
+    
+    for (int i = 0; i < files.length; i++) {
+      if (files[i].isDirectory()) {
+        addDirectoryToZip(files[i], pathToTop + "\\" + files[i].getName(), out);
+        continue;
+      }
+      try (FileInputStream in = new FileInputStream(files[i].getAbsolutePath())) {
+        out.putNextEntry(new ZipEntry(pathToTop + "\\" + files[i].getName()));
+        int len;
+        while ((len = in.read(buffer)) > 0) {
+          out.write(buffer, 0, len);
+        }
+        out.closeEntry();
+      }
+    }
+  }
+  
   /**
    * This uses the java.util.zip library to zip the given files to the given destination.
    *
@@ -193,27 +252,17 @@ public class IOHelper {
    * @param files
    * @throws FileNotFoundException
    * @throws IOException
+   * @throws Exception if the files are bigger than Integer.MAX_VALUE (2 GB)
    */
-  public static void zipFiles(File destination, File... files) throws FileNotFoundException, IOException {
-    try (ZipOutputStream out = new ZipOutputStream(new FileOutputStream(destination))) {
-      byte[] buffer = new byte[1024];
-      for (int i = 0; i < files.length; i++) {
-        try (FileInputStream in = new FileInputStream(files[i])) {
-          out.putNextEntry(new ZipEntry(files[i].getName()));
-
-          // Transfer bytes from the file to the ZIP file
-          int length;
-          while ((length = in.read(buffer)) > 0) {
-            out.write(buffer, 0, length);
-          }
-
-          // Complete the entry
-          out.closeEntry();
-        }
-      }
+  public static void zipFiles(File destination, File... files) throws FileNotFoundException, IOException, Exception {
+    HelperFile[] helperFiles = new HelperFile[files.length];
+    for (int i = 0; i < files.length; i++) {
+      helperFiles[i] = new HelperFile(files[i]);
     }
+    byte[] zipFiles = zipFiles(helperFiles);
+    saveBytesToFile(zipFiles, destination.getPath());
   }
-
+  
   /**
    * This uses the java.util.zip library to zip the given HelperFiles and return a byte array of the zip file.
    *
@@ -227,16 +276,17 @@ public class IOHelper {
     try (ZipOutputStream out = new ZipOutputStream(byteOutput)) {
       for (int i = 0; i < files.length; i++) {
         out.putNextEntry(new ZipEntry(files[i].getName()));
-
+        
         //Writes the HelperFile's bytes to the zipped file
         out.write(files[i].getBytes());
-
+        
         // Complete the entry
         out.closeEntry();
       }
     }
     return byteOutput.toByteArray();
   }
+  //</editor-fold>
 
   /**
    * Using the given urlString, this method creates and returns the buffered reader for that URL. Specifies UTF-8 format
@@ -345,22 +395,26 @@ public class IOHelper {
    * Gets all the files under the given file (not including the given file).
    *
    * @param file the file to get files under
-   * @param sublevels determines how many subdirectories to go before it stops adding files. Give 0 to get files only in
-   * the given directory (or just call getDirectoryFiles(file, extension) instead).
+   * @param subdirectories determines how many subdirectories to go before it stops adding files. Give 0 to get files
+   * only in the given directory (or just call getDirectoryFiles(file, extension) instead). If you want to get all files
+   * in all subdirectories, give anything less than -2. Be careful though, if it's a high parent directory, this might
+   * take a while to return :)
    * @param extension the extension(s) to add to the returned list. If null or omitted will add all files to the
    * returned list (not including directories)
    * @return
    */
-  public static java.util.List<File> getAllFiles(File file, int sublevels, String... extension) {
+  public static java.util.List<File> getAllFiles(File file, int subdirectories, String... extension) {
     java.util.List<File> filesList = new java.util.ArrayList<>();
-    if (sublevels < -1) {
+    if (subdirectories == -2) {
+      //This is -2 because if a user gives a directory and the subdirectories as 0, it should skip this twice.
+      //It's not a < -1 because if they want to get all files in the directory without care for subdirectories.
       return filesList; //Important it doesn't return null.
     }
     if (file.isDirectory()) {
       File[] listFiles = file.listFiles();
       if (listFiles != null) {
         for (File file1 : listFiles) {
-          filesList.addAll(getAllFiles(file1, sublevels - 1, extension));
+          filesList.addAll(getAllFiles(file1, subdirectories - 1, extension));
         }
       }
     } else if (file.isFile()) {
