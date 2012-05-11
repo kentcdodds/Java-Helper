@@ -134,11 +134,11 @@ public class StringHelper {
    * parameters.
    *
    * @param separator
-   * @param strings
+   * @param objects
    * @return
    */
-  public static String splitBy(String separator, java.util.List<String> strings) {
-    return splitBy(separator, strings.toArray(new String[strings.size()]));
+  public static String splitBy(String separator, java.util.List<Object> objects) {
+    return splitBy(separator, objects.toArray(new Object[objects.size()]));
   }
 
   /**
@@ -146,16 +146,16 @@ public class StringHelper {
    * the list
    *
    * @param separator
-   * @param strings
+   * @param objects
    * @return
    */
-  public static String splitBy(String separator, String... strings) {
+  public static String splitBy(String separator, Object... objects) {
     StringBuilder sb = new StringBuilder();
-    for (int i = 0; i < strings.length; i++) {
+    for (int i = 0; i < objects.length; i++) {
       if (i > 0) {
         sb.append(separator);
       }
-      sb.append(strings[i]);
+      sb.append(objects[i]);
     }
     return sb.toString();
   }
