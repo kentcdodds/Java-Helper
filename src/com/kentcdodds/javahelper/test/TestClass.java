@@ -24,19 +24,20 @@ import javax.swing.JLabel;
  * @author Kent
  */
 public class TestClass {
-  
+
   public static String testImageLocation = "/com/kentcdodds/javahelper/resources/iSayHiGuy.jpg";
-  
+
   public static void main(String[] args) throws Exception {
     setStuff();
-    email();
+    IOHelper.zipFiles(new File(IOHelper.homeDir + "\\test.zip"), new File(IOHelper.homeDir + "\\output1.xml"), new File(IOHelper.homeDir + "\\output2.xml"));
+//    email();
     //    List<File>[] replaced = IOHelper.replaceInAllFiles(new File("C:\\Users\\Kent\\Documents\\My Dropbox\\Work\\MGF\\NetBeansProjects\\MyVideoFacilitator\\src"),
     //            5, "org/mvf/resources/", "/org/mvf/resources/");
     //    PrinterHelper.setInstancePrint(true);
     //    IOHelper.sendReplaceInAllFilesToPrinter(replaced);
     System.exit(0);
   }
-  
+
   public static void email() throws MessagingException {
     String from = "from";
     List<String> to = new ArrayList<>();
@@ -79,12 +80,12 @@ public class TestClass {
     SwingHelper.centerAndPack(dialog);
     dialog.setVisible(true);
   }
-  
+
   public static void random() {
     boolean testDate = false;
     boolean testRandomStrings = true;
     int numberOfTests = 100;
-    
+
     if (testDate) {
       SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
       Date oldest = RandomHelper.getRandomDate(2012, 2012);
@@ -151,7 +152,7 @@ public class TestClass {
     cal2.set(Calendar.MINUTE, cal2.getActualMinimum(Calendar.MINUTE));
     cal2.set(Calendar.SECOND, cal2.getActualMinimum(Calendar.SECOND));
     cal2.set(Calendar.MILLISECOND, cal2.getActualMinimum(Calendar.MILLISECOND));
-    
+
     System.out.println("Cal1: " + cal1.getTime());
     System.out.println("Cal2: " + cal2.getTime());
     System.out.println("DaysDifference: " + DateHelper.getDaysDifference(cal1.getTime(), cal2.getTime()));

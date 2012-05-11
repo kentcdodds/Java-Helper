@@ -6,6 +6,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 /**
  *
@@ -140,7 +142,7 @@ public class IOHelper {
    * copyBytes() on it.
    *
    * @param bytes
-   * @param location 
+   * @param location
    * @throws FileNotFoundException
    * @throws IOException
    */
@@ -181,8 +183,35 @@ public class IOHelper {
    */
   public static byte[] getFileBytes(File file) throws FileNotFoundException, IOException, Exception {
     HelperFile helperFile = new HelperFile(file);
-    
     return helperFile.getBytes();
+  }
+
+  /**
+  * This uses the java.util.zip library to zip the given files to the given destination.
+  *
+  * @param destination
+  * @param files
+  * @throws FileNotFoundException
+  * @throws IOException
+  */
+  public static void zipFiles(File destination, File... files) throws FileNotFoundException, IOException {
+    try (ZipOutputStream out = new ZipOutputStream(new FileOutputStream(destination))) {
+      byte[] buffer = new byte[1024];
+      for (int i = 0; i < files.length; i++) {
+        try (FileInputStream in = new FileInputStream(files[i])) {
+          out.putNextEntry(new ZipEntry(files[i].getName()));
+
+          // Transfer bytes from the file to the ZIP file
+          int length;
+          while ((length = in.read(buffer)) > 0) {
+            out.write(buffer, 0, length);
+          }
+
+          // Complete the entry
+          out.closeEntry();
+        }
+      }
+    }
   }
 
   /**
@@ -368,7 +397,8 @@ public class IOHelper {
   }
 
   /**
-   * Saves the given object to the given destination
+   * Saves the given object to the given destination. The object and all it's variables must implement
+   * java.io.Serializable or the variables must have the keyword "transient" in front of it.
    *
    * @param object
    * @param savePath
