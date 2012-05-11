@@ -6,13 +6,14 @@ import com.kentcdodds.javahelper.model.EmailAttachment;
 import com.kentcdodds.javahelper.model.HelperFile;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 import javax.imageio.ImageIO;
 import javax.mail.MessagingException;
 import javax.mail.Session;
@@ -30,10 +31,34 @@ public class TestClass {
 
   public static void main(String[] args) throws Exception {
     setStuff();
-    HelperFile h1 = new HelperFile(IOHelper.getFileBytes(new File(IOHelper.homeDir + "\\output1.xml")), IOHelper.homeDir + "\\output1.xml");
-    HelperFile h2 = new HelperFile(IOHelper.getFileBytes(new File(IOHelper.homeDir + "\\output2.xml")), IOHelper.homeDir + "\\output2.xml");
-    byte[] zipFiles = IOHelper.zipFiles(h1, h2);
-    IOHelper.saveBytesToFile(zipFiles, IOHelper.homeDir + "\\testbytes.zip");
+    File f1 = new File(IOHelper.homeDir + "\\output1.xml");
+    File f2 = new File(IOHelper.homeDir + "\\output2.xml");
+    File f3 = new File(IOHelper.homeDir + "\\jre7\\");
+    String[] list = f3.list();
+    File[] files = new File[list.length];
+    for (int i = 0; i < list.length; i++) {
+      files[i] = new File(f3.getPath() + "\\" + list[i]);
+    }
+    Date start1 = new Date();
+    zipFiles(new byte[10485760], new File(IOHelper.homeDir + "\\test1.zip"), files);
+    Date end1 = new Date();
+    long diff1 = (end1.getTime() - start1.getTime());
+    Date start2 = new Date();
+    zipFiles(new byte[104857600], new File(IOHelper.homeDir + "\\test2.zip"), files);
+    Date end2 = new Date();
+    long diff2 = (end2.getTime() - start2.getTime());
+//    Date start3 = new Date();
+//    zipFiles(new byte[1048576000], new File(IOHelper.homeDir + "\\test3.zip"), f1,f2,f3);
+//    Date end3 = new Date();
+//    long diff3= (end3.getTime() - start3.getTime());
+//    Date start4 = new Date();
+//    zipFiles(new byte[1048576000], new File(IOHelper.homeDir + "\\test4.zip"), f1,f2,f3);
+//    Date end4 = new Date();
+//    long diff4 = (end4.getTime() - start4.getTime());
+    System.out.println("Test 1: " + diff1);
+    System.out.println("Test 2: " + diff2);
+//    System.out.println("Test 3: " + diff3);
+//    System.out.println("Test 4: " + diff4);
 //    IOHelper.zipFiles(new File(IOHelper.homeDir + "\\test.zip"), new File(IOHelper.homeDir + "\\output1.xml"), new File(IOHelper.homeDir + "\\output2.xml"));
 //    email();
     //    List<File>[] replaced = IOHelper.replaceInAllFiles(new File("C:\\Users\\Kent\\Documents\\My Dropbox\\Work\\MGF\\NetBeansProjects\\MyVideoFacilitator\\src"),
@@ -41,6 +66,33 @@ public class TestClass {
     //    PrinterHelper.setInstancePrint(true);
     //    IOHelper.sendReplaceInAllFilesToPrinter(replaced);
     System.exit(0);
+  }
+
+  /**
+   * This uses the java.util.zip library to zip the given files to the given destination.
+   *
+   * @param destination
+   * @param files
+   * @throws FileNotFoundException
+   * @throws IOException
+   */
+  public static void zipFiles(byte[] buffer, File destination, File... files) throws FileNotFoundException, IOException {
+    try (ZipOutputStream out = new ZipOutputStream(new FileOutputStream(destination))) {
+      for (int i = 0; i < files.length; i++) {
+        try (FileInputStream in = new FileInputStream(files[i])) {
+          out.putNextEntry(new ZipEntry(files[i].getName()));
+
+          // Transfer bytes from the file to the ZIP file
+          int length;
+          while ((length = in.read(buffer)) > 0) {
+            out.write(buffer, 0, length);
+          }
+
+          // Complete the entry
+          out.closeEntry();
+        }
+      }
+    }
   }
 
   public static void email() throws MessagingException {
