@@ -187,13 +187,13 @@ public class IOHelper {
   }
 
   /**
-  * This uses the java.util.zip library to zip the given files to the given destination.
-  *
-  * @param destination
-  * @param files
-  * @throws FileNotFoundException
-  * @throws IOException
-  */
+   * This uses the java.util.zip library to zip the given files to the given destination.
+   *
+   * @param destination
+   * @param files
+   * @throws FileNotFoundException
+   * @throws IOException
+   */
   public static void zipFiles(File destination, File... files) throws FileNotFoundException, IOException {
     try (ZipOutputStream out = new ZipOutputStream(new FileOutputStream(destination))) {
       byte[] buffer = new byte[1024];
@@ -212,6 +212,30 @@ public class IOHelper {
         }
       }
     }
+  }
+
+  /**
+   * This uses the java.util.zip library to zip the given HelperFiles and return a byte array of the zip file.
+   *
+   * @param files
+   * @return byte[] of the zip file of the given files
+   * @throws FileNotFoundException
+   * @throws IOException
+   */
+  public static byte[] zipFiles(HelperFile... files) throws FileNotFoundException, IOException {
+    ByteArrayOutputStream byteOutput = new ByteArrayOutputStream();
+    try (ZipOutputStream out = new ZipOutputStream(byteOutput)) {
+      for (int i = 0; i < files.length; i++) {
+        out.putNextEntry(new ZipEntry(files[i].getName()));
+
+        //Writes the HelperFile's bytes to the zipped file
+        out.write(files[i].getBytes());
+
+        // Complete the entry
+        out.closeEntry();
+      }
+    }
+    return byteOutput.toByteArray();
   }
 
   /**

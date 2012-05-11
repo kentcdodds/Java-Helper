@@ -137,7 +137,7 @@ public class StringHelper {
    * @param objects
    * @return
    */
-  public static String splitBy(String separator, java.util.List<Object> objects) {
+  public static <O extends Object> String splitBy(String separator, java.util.List<O> objects) {
     return splitBy(separator, objects.toArray(new Object[objects.size()]));
   }
 
@@ -149,7 +149,7 @@ public class StringHelper {
    * @param objects
    * @return
    */
-  public static String splitBy(String separator, Object... objects) {
+  public static <O extends Object> String splitBy(String separator, O... objects) {
     StringBuilder sb = new StringBuilder();
     for (int i = 0; i < objects.length; i++) {
       if (i > 0) {

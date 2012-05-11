@@ -3,6 +3,7 @@ package com.kentcdodds.javahelper.test;
 import com.kentcdodds.javahelper.helpers.*;
 import com.kentcdodds.javahelper.model.Email;
 import com.kentcdodds.javahelper.model.EmailAttachment;
+import com.kentcdodds.javahelper.model.HelperFile;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -29,7 +30,11 @@ public class TestClass {
 
   public static void main(String[] args) throws Exception {
     setStuff();
-    IOHelper.zipFiles(new File(IOHelper.homeDir + "\\test.zip"), new File(IOHelper.homeDir + "\\output1.xml"), new File(IOHelper.homeDir + "\\output2.xml"));
+    HelperFile h1 = new HelperFile(IOHelper.getFileBytes(new File(IOHelper.homeDir + "\\output1.xml")), IOHelper.homeDir + "\\output1.xml");
+    HelperFile h2 = new HelperFile(IOHelper.getFileBytes(new File(IOHelper.homeDir + "\\output2.xml")), IOHelper.homeDir + "\\output2.xml");
+    byte[] zipFiles = IOHelper.zipFiles(h1, h2);
+    IOHelper.saveBytesToFile(zipFiles, IOHelper.homeDir + "\\testbytes.zip");
+//    IOHelper.zipFiles(new File(IOHelper.homeDir + "\\test.zip"), new File(IOHelper.homeDir + "\\output1.xml"), new File(IOHelper.homeDir + "\\output2.xml"));
 //    email();
     //    List<File>[] replaced = IOHelper.replaceInAllFiles(new File("C:\\Users\\Kent\\Documents\\My Dropbox\\Work\\MGF\\NetBeansProjects\\MyVideoFacilitator\\src"),
     //            5, "org/mvf/resources/", "/org/mvf/resources/");
