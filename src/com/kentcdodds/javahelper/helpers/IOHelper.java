@@ -1,12 +1,14 @@
 package com.kentcdodds.javahelper.helpers;
 
 import com.kentcdodds.javahelper.model.HelperFile;
+import com.sun.xml.internal.messaging.saaj.util.ByteInputStream;
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 /**
@@ -18,21 +20,7 @@ public class IOHelper {
   public static final String homeDir = System.getProperty("user.home");
   public static final String[] badFileNameCharacters = new String[]{"\\", "/", ":", "*", "?", "\"", "<", ">", "|"};
 
-  /**
-   * Prints the given file string tot he file destination. Does not check the parent directory first
-   *
-   * @param destination
-   * @param string
-   * @throws FileNotFoundException
-   */
-  public static void print(File destination, String string) throws FileNotFoundException {
-    try (PrintWriter pw = new PrintWriter(destination, "UTF-8")) {
-      pw.print(string);
-    } catch (UnsupportedEncodingException ex) {
-      Logger.getLogger(IOHelper.class.getName()).log(Level.SEVERE, null, ex);
-    }
-  }
-
+  //<editor-fold defaultstate="collapsed" desc="Filename Methods">
   /**
    * Removes unsafe filename characters from the given string.
    *
@@ -64,9 +52,11 @@ public class IOHelper {
     }
     return false;
   }
+  //</editor-fold>
 
+  //<editor-fold defaultstate="collapsed" desc="To String Methods">
   /**
-   * Takes the file and returns it in a string
+   * Takes the file and returns it in a string. Uses UTF-8 encoding
    *
    * @param fileLocation
    * @return the file in String form
@@ -78,7 +68,7 @@ public class IOHelper {
   }
 
   /**
-   * Takes the given resource (based on the given class) and returns that as a string.
+   * Takes the given resource (based on the given class) and returns that as a string. Uses UTF-8 encoding
    *
    * @param resourceLocation of the file
    * @param klass class to get the resource from
@@ -109,7 +99,9 @@ public class IOHelper {
     stringWriter.close();
     return stringWriter.toString();
   }
+  //</editor-fold>
 
+  //<editor-fold defaultstate="collapsed" desc="File copy methods">
   /**
    * Copies the given resource file to the given destination. Does not check whether the destination exists.
    *
@@ -119,7 +111,7 @@ public class IOHelper {
    * @throws FileNotFoundException
    * @throws IOException
    */
-  public static void copyResourceFile(Class klass, String resourceLocation, File outputFile) throws FileNotFoundException, IOException {
+  public static void copyResource(Class klass, String resourceLocation, File outputFile) throws FileNotFoundException, IOException {
     InputStream inputStream = klass.getResourceAsStream(resourceLocation);
     saveInputStream(inputStream, outputFile);
   }
@@ -135,20 +127,6 @@ public class IOHelper {
   public static void copyFile(File sourceFile, File outputFile) throws FileNotFoundException, IOException {
     InputStream inputStream = new FileInputStream(sourceFile);
     saveInputStream(inputStream, outputFile);
-  }
-
-  /**
-   * Saves the given bytes to the output file. Creates a HelperFile with the given bytes and location then calls
-   * copyBytes() on it.
-   *
-   * @param bytes
-   * @param location
-   * @throws FileNotFoundException
-   * @throws IOException
-   */
-  public static void saveBytesToFile(byte[] bytes, String location) throws FileNotFoundException, IOException {
-    HelperFile helperFile = new HelperFile(bytes, location);
-    helperFile.saveBytes();
   }
 
   /**
@@ -170,6 +148,22 @@ public class IOHelper {
       inputStream.close();
     }
   }
+  //</editor-fold>
+
+  //<editor-fold defaultstate="collapsed" desc="File Bytes methods">
+  /**
+   * Saves the given bytes to the output file. Creates a HelperFile with the given bytes and location then calls
+   * copyBytes() on it.
+   *
+   * @param bytes
+   * @param location
+   * @throws FileNotFoundException
+   * @throws IOException
+   */
+  public static void saveBytesToFile(byte[] bytes, String location) throws FileNotFoundException, IOException {
+    HelperFile helperFile = new HelperFile(bytes, location);
+    helperFile.saveBytes();
+  }
 
   /**
    * Reads the given bytes into an array. The bytes must not exceed the array size limit of Integer.MAX_VALUE (which is
@@ -186,6 +180,29 @@ public class IOHelper {
     return helperFile.getBytes();
   }
 
+  /**
+   * Reads the given bytes into an array. The bytes must not exceed the array size limit of Integer.MAX_VALUE (which is
+   * 2^31 -1). This means you can only use this method with files under 2 gigabytes
+   *
+   * @param file
+   * @return
+   * @throws FileNotFoundException when trying to get the file
+   * @throws IOException when trying to read the file
+   * @throws Exception when trying to read a file too big for a byte[]
+   */
+  public static byte[] getResourceBytes(Class klass, String location) throws IOException {
+    ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
+    try (InputStream inputStream = klass.getResourceAsStream(location)) {
+      byte[] buffer = new byte[1024];
+      int length;
+      while ((length = inputStream.read(buffer)) > 0) {
+        byteOut.write(buffer, 0, length);
+      }
+    }
+    return byteOut.toByteArray();
+  }
+  //</editor-fold>
+
   //<editor-fold defaultstate="collapsed" desc="Zipping methods">
   /**
    * Zips the directory to the given destination.
@@ -200,9 +217,9 @@ public class IOHelper {
       addDirectoryToZip(directory, directory.getName(), out);
     }
   }
-  
+
   /**
-   * Zips the directory to the given destination.
+   * Zips the directory and returns the byte array of the resulting zipped file.
    *
    * @param destination
    * @param directory
@@ -216,7 +233,7 @@ public class IOHelper {
     }
     return byteOut.toByteArray();
   }
-  
+
   /**
    * Gets the files from the given directory and adds them to the output stream based on the pathToTop variable.
    *
@@ -228,7 +245,7 @@ public class IOHelper {
   private static void addDirectoryToZip(File directory, String pathToTop, ZipOutputStream out) throws IOException {
     File[] files = directory.listFiles();
     byte[] buffer = new byte[1024];
-    
+
     for (int i = 0; i < files.length; i++) {
       if (files[i].isDirectory()) {
         addDirectoryToZip(files[i], pathToTop + "\\" + files[i].getName(), out);
@@ -244,9 +261,12 @@ public class IOHelper {
       }
     }
   }
-  
+
   /**
-   * This uses the java.util.zip library to zip the given files to the given destination.
+   * This uses the java.util.zip library to zip the given files to the given destination. It creates a FileOutputStream
+   * for the given destination, then calls writeZipInToOut(fileOutput, files); The benchmark for this method has proven
+   * to be slightly slower than the zipFiles(HelperFile...) method, but this one can handle any file size while the
+   * other is limited to Integer.MAX_VALUE (2 GB sized files)
    *
    * @param destination
    * @param files
@@ -255,16 +275,14 @@ public class IOHelper {
    * @throws Exception if the files are bigger than Integer.MAX_VALUE (2 GB)
    */
   public static void zipFiles(File destination, File... files) throws FileNotFoundException, IOException, Exception {
-    HelperFile[] helperFiles = new HelperFile[files.length];
-    for (int i = 0; i < files.length; i++) {
-      helperFiles[i] = new HelperFile(files[i]);
+    try (FileOutputStream fileOutput = new FileOutputStream(destination)) {
+      writeZipInToOut(fileOutput, files);
     }
-    byte[] zipFiles = zipFiles(helperFiles);
-    saveBytesToFile(zipFiles, destination.getPath());
   }
-  
+
   /**
-   * This uses the java.util.zip library to zip the given HelperFiles and return a byte array of the zip file.
+   * This uses the java.util.zip library to zip the given HelperFiles and return a byte array of the zip file. Creates a
+   * ByteArrayOutputStream, calls writeZipInToOut(byteOutput, files); and returns byteOutput.toByteArray()
    *
    * @param files
    * @return byte[] of the zip file of the given files
@@ -273,36 +291,88 @@ public class IOHelper {
    */
   public static byte[] zipFiles(HelperFile... files) throws FileNotFoundException, IOException {
     ByteArrayOutputStream byteOutput = new ByteArrayOutputStream();
-    try (ZipOutputStream out = new ZipOutputStream(byteOutput)) {
+    writeZipInToOut(byteOutput, files);
+    return byteOutput.toByteArray();
+  }
+
+  public static void writeZipInToOut(OutputStream outStream, File... files) throws IOException {
+    try (ZipOutputStream out = new ZipOutputStream(outStream)) {
       for (int i = 0; i < files.length; i++) {
         out.putNextEntry(new ZipEntry(files[i].getName()));
-        
-        //Writes the HelperFile's bytes to the zipped file
-        out.write(files[i].getBytes());
-        
+
+        if (files[i] instanceof HelperFile) {
+          //Writes the HelperFile's bytes to the zipped file
+          out.write(((HelperFile) files[i]).getBytes());
+        } else {
+          FileInputStream fileIn = new FileInputStream(files[i]);
+          byte[] buffer = new byte[1024];
+          int length;
+          while ((length = fileIn.read(buffer)) != -1) {
+            out.write(buffer, 0, length);
+          }
+        }
+
         // Complete the entry
         out.closeEntry();
       }
     }
-    return byteOutput.toByteArray();
+  }
+
+  /**
+   * Takes a zipped file and unzips it to the given destination directory
+   *
+   * @param zippedFile
+   * @param destination
+   * @throws FileNotFoundException
+   * @throws IOException
+   */
+  public static void unzipFiles(File zippedFile, File destination) throws FileNotFoundException, IOException {
+    ZipInputStream zipIn;
+    try (FileInputStream fileInputStream = new FileInputStream(zippedFile)) {
+      zipIn = new ZipInputStream(fileInputStream);
+      ZipEntry nextEntry;
+      while ((nextEntry = zipIn.getNextEntry()) != null) {
+        try (FileOutputStream fileOut = new FileOutputStream(destination.getPath() + "\\" + nextEntry.getName())) {
+          byte[] buffer = new byte[1024];
+          int length;
+          while ((length = zipIn.read(buffer)) != -1) {
+            fileOut.write(buffer, 0, length);
+          }
+          fileOut.close();
+        }
+      }
+    }
+    zipIn.close();
+  }
+
+  /**
+   * Takes a zipped file and unzips it to the given destination directory
+   *
+   * @param zippedFile
+   * @param destination
+   * @throws FileNotFoundException
+   * @throws IOException
+   */
+  public static java.util.List<HelperFile> unzipFiles(HelperFile zippedFile) throws FileNotFoundException, IOException {
+    java.util.List<HelperFile> helperFiles = new java.util.ArrayList<>();
+    try (ZipInputStream zipIn = new ZipInputStream(new ByteArrayInputStream(zippedFile.getBytes()))) {
+      ZipEntry nextEntry;
+      while ((nextEntry = zipIn.getNextEntry()) != null) {
+        try (ByteArrayOutputStream byteOut = new ByteArrayOutputStream()) {
+          byte[] buffer = new byte[1024];
+          int length;
+          while ((length = zipIn.read(buffer)) != -1) {
+            byteOut.write(buffer, 0, length);
+          }
+          helperFiles.add(new HelperFile(byteOut.toByteArray(), nextEntry.getName()));
+        }
+      }
+    }
+    return helperFiles;
   }
   //</editor-fold>
 
-  /**
-   * Using the given urlString, this method creates and returns the buffered reader for that URL. Specifies UTF-8 format
-   *
-   * @param urlString
-   * @return
-   * @throws MalformedURLException
-   * @throws IOException
-   */
-  public static BufferedReader getBufferedReader(String urlString) throws MalformedURLException, IOException {
-    URL url = new URL(urlString);
-    InputStream is = url.openStream();
-    BufferedReader br = new BufferedReader(new InputStreamReader(is, "UTF-8"));
-    return br;
-  }
-
+  //<editor-fold defaultstate="collapsed" desc="Find and replace methods">
   /**
    * Replaces the given find with the given replace in the given file. Reads the file to a string, replaces the find
    * with the replace in the string and prints the new string on top of the original file.
@@ -390,7 +460,9 @@ public class IOHelper {
     }
     PrinterHelper.print("Total Error Files: " + errorFiles.size());
   }
+  //</editor-fold>
 
+  //<editor-fold defaultstate="collapsed" desc="Get files and directories">
   /**
    * Gets all the files under the given file (not including the given file).
    *
@@ -473,7 +545,9 @@ public class IOHelper {
     }
     return filesList;
   }
+  //</editor-fold>
 
+  //<editor-fold defaultstate="collapsed" desc="Object save and load methods">
   /**
    * Saves the given object to the given destination. The object and all it's variables must implement
    * java.io.Serializable or the variables must have the keyword "transient" in front of it.
@@ -501,4 +575,39 @@ public class IOHelper {
     ObjectInputStream o_in = new ObjectInputStream(f_in);
     return o_in.readObject();
   }
+  //</editor-fold>
+
+  //<editor-fold defaultstate="collapsed" desc="Other IO methods">
+  /**
+   * Prints the given file string to the file destination. This same operation could be done by calling
+   * saveBytes(string.getBytes(), destination). When benchmarking, this method was found to be only a few milliseconds
+   * faster.
+   *
+   * @param destination
+   * @param string
+   * @throws FileNotFoundException
+   */
+  public static void print(File destination, String string) throws FileNotFoundException {
+    try (PrintWriter pw = new PrintWriter(destination, "UTF-8")) {
+      pw.print(string);
+    } catch (UnsupportedEncodingException ex) {
+      Logger.getLogger(IOHelper.class.getName()).log(Level.SEVERE, null, ex);
+    }
+  }
+
+  /**
+   * Using the given urlString, this method creates and returns the buffered reader for that URL. Specifies UTF-8 format
+   *
+   * @param urlString
+   * @return
+   * @throws MalformedURLException
+   * @throws IOException
+   */
+  public static BufferedReader getBufferedReader(String urlString) throws MalformedURLException, IOException {
+    URL url = new URL(urlString);
+    InputStream is = url.openStream();
+    BufferedReader br = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+    return br;
+  }
+  //</editor-fold>
 }
