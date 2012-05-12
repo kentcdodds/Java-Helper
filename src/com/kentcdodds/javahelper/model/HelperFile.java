@@ -4,6 +4,10 @@ import com.kentcdodds.javahelper.helpers.IOHelper;
 import java.io.*;
 
 /**
+ * This class is really helpful for dealing with files in memory. The major difference between this and a regular file
+ * (which it extends) is this has a byte[] of its bytes which can be set and therefore you can hand this around as a
+ * regular file but treat it like it exists only in memory. The IOHelper and the EmailHelper each have methods which
+ * can use this class powerfully.
  *
  * @author kentcdodds
  */
@@ -12,7 +16,7 @@ public class HelperFile extends File {
   private byte[] bytes;
 
   /**
-   * Constructor for HelperFile
+   * Constructor for HelperFile. Calls generateBytes() when path has been set
    *
    * @param path the path to the file
    * @throws FileNotFoundException when trying to read the file
@@ -25,8 +29,7 @@ public class HelperFile extends File {
   }
 
   /**
-   * Convenience constructor. Just gets the path of the file and does the exact same thing as the constructor
-   * requiring a path
+   * Constructor for HelperFile. Calls generateBytes() when path has been set
    *
    * @param file getPath is called in super()
    * @throws FileNotFoundException when trying to read the file
