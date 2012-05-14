@@ -6,14 +6,14 @@ import com.kentcdodds.javahelper.model.EmailAttachment;
 import com.kentcdodds.javahelper.model.HelperFile;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
-import java.io.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 import javax.imageio.ImageIO;
 import javax.mail.MessagingException;
 import javax.mail.Session;
@@ -28,71 +28,67 @@ import javax.swing.JLabel;
 public class TestClass {
 
   public static String testImageLocation = "/com/kentcdodds/javahelper/resources/iSayHiGuy.jpg";
+  public static File ioPlaygroundDir = new File(IOHelper.homeDir + "\\IOPlayground\\");
 
   public static void main(String[] args) throws Exception {
     setStuff();
-    File f1 = new File(IOHelper.homeDir + "\\output1.xml");
-    File f2 = new File(IOHelper.homeDir + "\\output2.xml");
-    File f3 = new File(IOHelper.homeDir + "\\jre7\\");
-    String[] list = f3.list();
-    File[] files = new File[list.length];
-    for (int i = 0; i < list.length; i++) {
-      files[i] = new File(f3.getPath() + "\\" + list[i]);
-    }
-    Date start1 = new Date();
-    zipFiles(new byte[10485760], new File(IOHelper.homeDir + "\\test1.zip"), files);
-    Date end1 = new Date();
-    long diff1 = (end1.getTime() - start1.getTime());
-    Date start2 = new Date();
-    zipFiles(new byte[104857600], new File(IOHelper.homeDir + "\\test2.zip"), files);
-    Date end2 = new Date();
-    long diff2 = (end2.getTime() - start2.getTime());
-//    Date start3 = new Date();
-//    zipFiles(new byte[1048576000], new File(IOHelper.homeDir + "\\test3.zip"), f1,f2,f3);
-//    Date end3 = new Date();
-//    long diff3= (end3.getTime() - start3.getTime());
-//    Date start4 = new Date();
-//    zipFiles(new byte[1048576000], new File(IOHelper.homeDir + "\\test4.zip"), f1,f2,f3);
-//    Date end4 = new Date();
-//    long diff4 = (end4.getTime() - start4.getTime());
-    System.out.println("Test 1: " + diff1);
-    System.out.println("Test 2: " + diff2);
-//    System.out.println("Test 3: " + diff3);
-//    System.out.println("Test 4: " + diff4);
-//    IOHelper.zipFiles(new File(IOHelper.homeDir + "\\test.zip"), new File(IOHelper.homeDir + "\\output1.xml"), new File(IOHelper.homeDir + "\\output2.xml"));
-//    email();
-    //    List<File>[] replaced = IOHelper.replaceInAllFiles(new File("C:\\Users\\Kent\\Documents\\My Dropbox\\Work\\MGF\\NetBeansProjects\\MyVideoFacilitator\\src"),
-    //            5, "org/mvf/resources/", "/org/mvf/resources/");
-    //    PrinterHelper.setInstancePrint(true);
-    //    IOHelper.sendReplaceInAllFilesToPrinter(replaced);
+    unzip();
     System.exit(0);
   }
 
   /**
-   * This uses the java.util.zip library to zip the given files to the given destination.
+   * Tests for unzip methods
+   * @throws FileNotFoundException
+   * @throws IOException 
+   */
+  public static void unzip() throws FileNotFoundException, IOException, Exception {
+//    File zipped = new File(ioPlaygroundDir, "unzip-haha.zip");
+//    File zipOutput = new File(ioPlaygroundDir, "unzip-hahe\\");
+//    zipOutput.mkdir();
+//    IOHelper.unzipFiles(zipped, zipOutput);
+    
+    
+    HelperFile hFile1 = new HelperFile(new File(ioPlaygroundDir, "wiki1.txt"));
+    HelperFile hFile2 = new HelperFile(new File(ioPlaygroundDir,  "wiki2.txt"));
+    byte[] zipFiles = IOHelper.zipFiles(hFile1, hFile2);
+    List<HelperFile> unzipFiles = IOHelper.unzipFiles(new HelperFile(zipFiles, "This is the zip"));
+    for (HelperFile helperFile : unzipFiles) {
+      IOHelper.saveBytesToFile(helperFile.getBytes(), ioPlaygroundDir + "\\helperout\\" + helperFile.getName());
+    }
+  }
+
+  /**
+   * Tests for zip methods and benchmarking
    *
-   * @param destination
-   * @param files
    * @throws FileNotFoundException
    * @throws IOException
+   * @throws Exception
    */
-  public static void zipFiles(byte[] buffer, File destination, File... files) throws FileNotFoundException, IOException {
-    try (ZipOutputStream out = new ZipOutputStream(new FileOutputStream(destination))) {
-      for (int i = 0; i < files.length; i++) {
-        try (FileInputStream in = new FileInputStream(files[i])) {
-          out.putNextEntry(new ZipEntry(files[i].getName()));
+  public static void zip() throws FileNotFoundException, IOException, Exception {
+    //Setup files
+    File file1 = new File(IOHelper.homeDir + "\\wiki1.txt");
+    File file2 = new File(IOHelper.homeDir + "\\wiki2.txt");
+    HelperFile hFile1 = new HelperFile(file1);
+    HelperFile hFile2 = new HelperFile(file2);
 
-          // Transfer bytes from the file to the ZIP file
-          int length;
-          while ((length = in.read(buffer)) > 0) {
-            out.write(buffer, 0, length);
-          }
-
-          // Complete the entry
-          out.closeEntry();
-        }
-      }
+    Date start1 = new Date();
+    for (int i = 0; i < 10; i++) {
+      IOHelper.zipFiles(new File(IOHelper.homeDir + "\\Test With Files.zip"), file1, file2);
     }
+    Date end1 = new Date();
+    long diff1 = end1.getTime() - start1.getTime();
+    System.out.println("Test with files time: " + diff1);
+
+
+    Date start2 = new Date();
+    for (int i = 0; i < 10; i++) {
+      byte[] zipFiles = IOHelper.zipFiles(hFile1, hFile2);
+      IOHelper.saveBytesToFile(zipFiles, IOHelper.homeDir + "\\Test with Helpers.zip");
+    }
+    Date end2 = new Date();
+    long diff2 = end2.getTime() - start2.getTime();
+    System.out.println("Test with Helpers time: " + diff2);
+    System.out.println("Time difference (diff1 - diff2): " + (diff1 - diff2));
   }
 
   public static void email() throws MessagingException {

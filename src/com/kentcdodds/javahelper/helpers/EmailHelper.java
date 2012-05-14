@@ -64,7 +64,7 @@ public class EmailHelper {
     properties.put("mail.smtp.auth", "true");
     properties.put("mail.smtp.port", "465");
 
-    return Session.getInstance(properties, new javax.mail.Authenticator() {
+    return Session.getInstance(properties, new Authenticator() {
 
       @Override
       protected PasswordAuthentication getPasswordAuthentication() {
@@ -87,7 +87,7 @@ public class EmailHelper {
     properties.put("mail.smtp.starttls.enable", "true");
     properties.put("mail.smtp.auth", "true");
 
-    return Session.getInstance(properties, new javax.mail.Authenticator() {
+    return Session.getInstance(properties, new Authenticator() {
 
       @Override
       protected PasswordAuthentication getPasswordAuthentication() {
