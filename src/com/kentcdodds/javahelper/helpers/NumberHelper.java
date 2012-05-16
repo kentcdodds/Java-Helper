@@ -49,13 +49,36 @@ public class NumberHelper {
   }
 
   /**
-   * Rounds the given amount half up
+   * Rounds the given amount half up by two digits (good for money)
    *
    * @param amount the double to round
    * @return the rounded amount
    */
   public static double round(double amount) {
-    return Double.parseDouble(new BigDecimal(amount).setScale(2, BigDecimal.ROUND_HALF_UP).toString());
+    return round(amount, 2);
+  }
+
+  /**
+   * Rounds the given amount half up to the given digits
+   *
+   * @param amount the double to round
+   * @param digits the digits to round to
+   * @return the rounded amount
+   */
+  public static double round(double amount, int digits) {
+    return round(amount, digits, BigDecimal.ROUND_HALF_UP);
+  }
+
+  /**
+   * Rounds the given amount by the given digits in the given direction
+   *
+   * @param amount the double to round
+   * @param digits the digits to round to
+   * @param round the type of round to perform
+   * @return the rounded amount for example BigDecimal.ROUND_HALF_UP
+   */
+  public static double round(double amount, int digits, int round) {
+    return Double.parseDouble(new BigDecimal(amount).setScale(digits, round).toString());
   }
 
   /**
@@ -70,8 +93,8 @@ public class NumberHelper {
   }
 
   /**
-   * Removes all non number characters. Note: does not remove decimals (.) so a given number like this:
-   * 93)23.42-235.234 will come out looking like this 9323.42235.234
+   * Removes all non number characters. Note: does not remove decimals (.) so a given number like this: 93)23.42-235.234
+   * will come out looking like this 9323.42235.234
    *
    * @param number
    * @return
