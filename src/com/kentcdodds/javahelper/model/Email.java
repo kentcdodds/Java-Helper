@@ -29,10 +29,10 @@ public class Email {
   /**
    * Convenience Constructor: The bare minimum information you need to send an e-mail.
    *
-   * @param from 
-   * @param to 
-   * @param body 
-   * @param subject 
+   * @param from
+   * @param to
+   * @param body
+   * @param subject
    */
   public Email(String from, String to, String subject, String body) {
     this.from = from;
@@ -44,12 +44,12 @@ public class Email {
   /**
    * Constructor: Use for e-mails without attachments
    *
-   * @param from 
-   * @param to 
-   * @param body 
-   * @param cc 
-   * @param bcc 
-   * @param subject 
+   * @param from
+   * @param to
+   * @param body
+   * @param cc
+   * @param bcc
+   * @param subject
    */
   public Email(String from, List<String> to, List<String> cc, List<String> bcc, String subject, String body) {
     this.from = from;
@@ -62,13 +62,14 @@ public class Email {
 
   /**
    * Constructor: Use for e-mails with attachments
+   *
    * @param from
-   * @param to 
+   * @param to
    * @param bodyParts
-   * @param cc 
+   * @param cc
    * @param subject
    * @param bcc
-   * @param body  
+   * @param body
    */
   public Email(String from, List<String> to, List<String> cc, List<String> bcc, String subject, String body, List<MimeBodyPart> bodyParts) {
     this.from = from;
@@ -87,18 +88,18 @@ public class Email {
    *
    * @param attachment
    * @return whether the attachment was successfully added to the bodyParts list
-   * @throws MessagingException  
+   * @throws MessagingException
    */
   public boolean addEmailAttachment(EmailAttachment attachment) throws MessagingException {
-    if (attachment.getBodyPart() == null) {
+      if (attachment.getBodyPart() == null) {
       boolean success = attachment.generateMimeBodyPart();
-      if (!success) {
+        if (!success) {
         return false;
+        }
       }
-    }
-    bodyParts.add(attachment.getBodyPart());
+      bodyParts.add(attachment.getBodyPart());
     return true;
-  }
+    }
 
   //<editor-fold defaultstate="collapsed" desc="Getters and Setters">
   /**
@@ -199,5 +200,4 @@ public class Email {
     this.body = body;
   }
   //</editor-fold>
-
 }
