@@ -579,6 +579,17 @@ public class IOHelper {
 
   //<editor-fold defaultstate="collapsed" desc="Other IO methods">
   /**
+   * Makes sure that the given file's parent directory exists. Creates it if not.
+   *
+   * @param file the file to check
+   */
+  public static void checkDirectory(File file) {
+    if (!new File(file.getParent()).exists()) {
+      new File(file.getParent()).mkdir();
+    }
+  }
+
+  /**
    * Prints the given file string to the file destination. This same operation could be done by calling
    * saveBytes(string.getBytes(), destination). When benchmarking, this method was found to be only a few milliseconds
    * faster.

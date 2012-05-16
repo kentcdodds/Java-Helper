@@ -9,16 +9,6 @@ import java.io.File;
  */
 public class OtherHelper {
 
-  /**
-   * Makes sure that the given file's parent directory exists. Creates it if not.
-   *
-   * @param file the file to check
-   */
-  public static void checkDirectory(File file) {
-    if (!new File(file.getParent()).exists()) {
-      new File(file.getParent()).mkdir();
-    }
-  }
 
   /**
    * Checks whether any of the given parameters are null
