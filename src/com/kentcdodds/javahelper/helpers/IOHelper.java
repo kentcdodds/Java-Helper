@@ -1,7 +1,6 @@
 package com.kentcdodds.javahelper.helpers;
 
 import com.kentcdodds.javahelper.model.HelperFile;
-import com.sun.xml.internal.messaging.saaj.util.ByteInputStream;
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
