@@ -159,4 +159,19 @@ public class StringHelper {
     }
     return sb.toString();
   }
+
+  /**
+   * Simple method, returns the same string you give repeated the number of times you give.
+   *
+   * @param string
+   * @param times
+   * @return
+   */
+  public static String repeatString(String string, int times) {
+    StringBuilder sb = new StringBuilder();
+    for (int i = 0; i < times; i++) {
+      sb.append(string);
+    }
+    return sb.toString();
+  }
 }
