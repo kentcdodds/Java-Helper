@@ -4,6 +4,8 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import org.psafix.folderchooser.JFolderChooser;
@@ -18,6 +20,8 @@ public class SwingHelper {
    * The number of characters used when wordWrappedMessage(String message) is called. Defaults to 50
    */
   private static int wordWrapChars = 50;
+  private static int windowXCenter = -1;
+  private static int windowYCenter = -1;
 
   //<editor-fold defaultstate="collapsed" desc="Window size/position Methods">
   /**
@@ -27,8 +31,8 @@ public class SwingHelper {
    */
   public static void centerAndPack(Window window) {
     window.pack();
-    int y = (int) (Toolkit.getDefaultToolkit().getScreenSize().getHeight() / 2) - window.getHeight() / 2;
-    int x = (int) (Toolkit.getDefaultToolkit().getScreenSize().getWidth() / 2) - window.getWidth() / 2;
+    int x = getWindowXCenter() - (window.getWidth() / 2);
+    int y = getWindowYCenter() - (window.getHeight() / 2);
     window.setLocation(x, y);
     window.setMinimumSize(new Dimension(window.getWidth(), window.getHeight()));
   }
@@ -42,6 +46,19 @@ public class SwingHelper {
     frame.setExtendedState(frame.getExtendedState() | JFrame.MAXIMIZED_BOTH);
   }
   //</editor-fold>
+
+  //<editor-fold defaultstate="collapsed" desc="Image methods">
+  /**
+   * Returns the image pointed at by the given urlString
+   *
+   * @param urlString the location of the image
+   * @return the image
+   * @throws MalformedURLException
+   */
+  public static Image getImageFromUrl(String urlString) throws MalformedURLException {
+    URL url = new URL(urlString);
+    return Toolkit.getDefaultToolkit().createImage(url);
+  }
 
   //<editor-fold defaultstate="collapsed" desc="Resize Image Methods">
   /**
@@ -97,8 +114,8 @@ public class SwingHelper {
   }
 
   /**
-   * Convenience method. Creates a BufferedImage from the given file location and returns resizeImage(image,
-   * width, height, max).
+   * Convenience method. Creates a BufferedImage from the given file location and returns resizeImage(image, width,
+   * height, max).
    *
    * @param location the location of the image
    * @param width the desired width of the new image. Negative values force the only constraint to be height.
@@ -127,8 +144,8 @@ public class SwingHelper {
   }
 
   /**
-   * Convenience method. Creates a BufferedImage from the given resource location (respective to the given
-   * class) and returns resizeImage(image, width, height, max).
+   * Convenience method. Creates a BufferedImage from the given resource location (respective to the given class) and
+   * returns resizeImage(image, width, height, max).
    *
    * @param klass the class to get the resource from
    * @param location the location of the resource respective to the class
@@ -165,8 +182,7 @@ public class SwingHelper {
    *
    * @param container where you want the image
    * @param image the image to add
-   * @param setWidth if true will set the width as the given size, if false, will set the height as the given
-   * size
+   * @param setWidth if true will set the width as the given size, if false, will set the height as the given size
    * @param size 0 - 4 is smallest to biggest
    * @param anchor use java.awt.GridBagConstraints.CENTER (for example)
    * @param bottom if true, image will appear on the bottom, if false, image will appear on the right.
@@ -204,8 +220,7 @@ public class SwingHelper {
    *
    * @param container where you want the image
    * @param location the location of the file
-   * @param setWidth if true will set the width as the given size, if false, will set the height as the given
-   * size
+   * @param setWidth if true will set the width as the given size, if false, will set the height as the given size
    * @param size 0 - 4 is smallest to biggest
    * @param anchor use java.awt.GridBagConstraints.CENTER (for example)
    * @param bottom if true, image will appear on the bottom, if false, image will appear on the right.
@@ -222,8 +237,7 @@ public class SwingHelper {
    * @param klass the class to get the resource from
    * @param container where you want the image
    * @param location the location of the resource with respect to the given class
-   * @param setWidth if true will set the width as the given size, if false, will set the height as the given
-   * size
+   * @param setWidth if true will set the width as the given size, if false, will set the height as the given size
    * @param size 0 - 4 is smallest to biggest
    * @param anchor use java.awt.GridBagConstraints.CENTER (for example)
    * @param bottom if true, image will appear on the bottom, if false, image will appear on the right.
@@ -234,11 +248,11 @@ public class SwingHelper {
     addImage(container, image, setWidth, size, anchor, bottom);
   }
   //</editor-fold>
+  //</editor-fold>
 
   //<editor-fold defaultstate="collapsed" desc="Other Methods">
   /**
-   * Gets the top parent Window of the given component. There is a limit to how far up the parent stack it'll
-   * go.
+   * Gets the top parent Window of the given component. There is a limit to how far up the parent stack it'll go.
    *
    * @param <T>
    * @param jComponent
@@ -261,26 +275,40 @@ public class SwingHelper {
   }
 
   /**
-   * Returns a window with a partially opaque progress Icon
+   * Returns a window with a partially opaque progress Icon. Sets the opacity, location and size (to the given icon
+   * size) (does not pack the image)
+   *
+   * @param icon the icon to set in the progress window
+   * @param opacity a float value from 0-1
+   * @param x the x location of the window
+   * @param y the y location of the window
+   * @return a jWindow of the progress wheel
+   */
+  public static JWindow getProgressWheelWindow(final Icon icon, final Float opacity, final int x, final int y) {
+    JWindow jWindow = new JWindow() {
+
+      {
+        setOpacity(opacity);
+        setLocation(x, y);
+        setSize(icon.getIconWidth(), icon.getIconHeight());
+        add(new JLabel(icon));
+      }
+    };
+
+    return jWindow;
+  }
+
+  /**
+   * Convenience method. Returns a window with a partially opaque progress Icon in the center of the screen
    *
    * @param icon the icon to set in the progress window
    * @return a jWindow of the progress wheel
    */
   public static JWindow getProgressWheelWindow(final Icon icon) {
-    JWindow jWindow = new JWindow() {
-
-      {
-        setOpacity(.842f);
-        setLocation(0, 0);
-        setSize(icon.getIconWidth(), icon.getIconHeight());
-        add(new JLabel(icon));
-        pack();
-      }
-    };
-
-    centerAndPack(jWindow);
-
-    return jWindow;
+    JWindow window = getProgressWheelWindow(icon, .85f, 0, 0);
+    //It's faster and simpler just to set the location to 0, 0 and then call center and pack on it
+    centerAndPack(window);
+    return window;
   }
   //</editor-fold>
 
@@ -346,8 +374,8 @@ public class SwingHelper {
    * @param parent of the JFolderChooser
    * @param title of the JFolderChooser
    * @param dimension of the JFolderChooser
-   * @return the selected path. Returns null if the user did not activate the approve option (closed the
-   * window or clicked "Cancel")
+   * @return the selected path. Returns null if the user did not activate the approve option (closed the window or
+   * clicked "Cancel")
    */
   public static String chooseFolder(String startingPath, Component parent, String title, Dimension dimension) {
     try {
@@ -371,8 +399,8 @@ public class SwingHelper {
 
   //<editor-fold defaultstate="collapsed" desc="JOptionPane Methods">
   /**
-   * Convenience Method: Calls StringHelper.wordWrappedMessage(message, getWordWrapChars()). A method like
-   * this allows you to keep everything standard for JOptionPane messages
+   * Convenience Method: Calls StringHelper.wordWrappedMessage(message, getWordWrapChars()). A method like this allows
+   * you to keep everything standard for JOptionPane messages
    *
    * @param message
    * @return
@@ -382,8 +410,8 @@ public class SwingHelper {
   }
 
   /**
-   * Shows an error message with the given message. Calls wordWrappedMessage(message). The title and the
-   * content have preset text.
+   * Shows an error message with the given message. Calls wordWrappedMessage(message). The title and the content have
+   * preset text.
    *
    * @param parent the parent for the JOptionPane
    * @param message the message for the error
@@ -440,8 +468,8 @@ public class SwingHelper {
   }
 
   /**
-   * Sets the background color of all the components in the frame Color the frame what you want the background
-   * for all components to be
+   * Sets the background color of all the components in the frame Color the frame what you want the background for all
+   * components to be
    *
    * @param container (start with the frame, it will recursively go through containers
    * @param color
@@ -458,19 +486,59 @@ public class SwingHelper {
 
   //<editor-fold defaultstate="collapsed" desc="Getters and Setters">
   /**
-   * @return the wordWrapChars. This is the number of characters to wrap JOptionPane messages with when you
-   * call wordWrappedMessage(String message)
+   * @return the wordWrapChars. This is the number of characters to wrap JOptionPane messages with when you call
+   * wordWrappedMessage(String message)
    */
   public static int getWordWrapChars() {
     return wordWrapChars;
   }
 
   /**
-   * @param aWordWrapChars the wordWrapChars to set. This is the number of characters to wrap JOptionPane
-   * messages with when you call wordWrappedMessage(String message)
+   * @param aWordWrapChars the wordWrapChars to set. This is the number of characters to wrap JOptionPane messages with
+   * when you call wordWrappedMessage(String message)
    */
   public static void setWordWrapChars(int aWordWrapChars) {
     wordWrapChars = aWordWrapChars;
+  }
+
+  /**
+   * Don't use this method unless you want all the centerAndPack calls to set the center of the window somewhere other
+   * than the center!
+   *
+   * @return the windowXCenter
+   */
+  public static int getWindowXCenter() {
+    if (windowXCenter == -1) {
+      windowXCenter = (int) Toolkit.getDefaultToolkit().getScreenSize().getWidth() / 2;
+    }
+    return windowXCenter;
+  }
+
+  /**
+   * Don't use this method unless you want all the centerAndPack calls to set the center of the window somewhere other
+   * than the center!
+   *
+   * @param aWindowXCenter the windowXCenter to set
+   */
+  public static void setWindowXCenter(int aWindowXCenter) {
+    windowXCenter = aWindowXCenter;
+  }
+
+  /**
+   * @return the windowYCenter
+   */
+  public static int getWindowYCenter() {
+    if (windowYCenter == -1) {
+      windowYCenter = (int) Toolkit.getDefaultToolkit().getScreenSize().getHeight() / 2;
+    }
+    return windowYCenter;
+  }
+
+  /**
+   * @param aWindowYCenter the windowYCenter to set
+   */
+  public static void setWindowYCenter(int aWindowYCenter) {
+    windowYCenter = aWindowYCenter;
   }
   //</editor-fold>
 }
