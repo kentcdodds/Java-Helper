@@ -10,6 +10,12 @@ import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import javax.mail.util.ByteArrayDataSource;
 import com.kentcdodds.javahelper.model.Email;
+import com.kentcdodds.javahelper.model.EmailAttachment;
+import com.kentcdodds.javahelper.model.HelperFile;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -22,12 +28,10 @@ public class EmailHelper {
   public static final int YAHOO = 125;
 
   /**
-   * Convenience method. Sends an e-mail using the javax.mail Library with the given service
-   * (EmailHelper.GOOGLE_APPS for example). In some cases which don't require authentication, null may be used
-   * for username and password.
+   * Convenience method. Sends an e-mail using the javax.mail Library with the given service (EmailHelper.GOOGLE_APPS
+   * for example). In some cases which don't require authentication, null may be used for username and password.
    *
-   * @param service an integer representing the service you wish to send the e-mail with. Like
-   * EmailHelper.GOOGLE_APPS.
+   * @param service an integer representing the service you wish to send the e-mail with. Like EmailHelper.GOOGLE_APPS.
    * @param email the e-mail to send
    * @param username the username for authentication
    * @param password the password for authentication
@@ -50,7 +54,8 @@ public class EmailHelper {
   }
 
   /**
-   * Gets a javax.mail.Session for Google apps and Gmail. When you send your e-mail, the from address will be forced to the username you give here.
+   * Gets a javax.mail.Session for Google apps and Gmail. When you send your e-mail, the from address will be forced to
+   * the username you give here.
    *
    * @param username
    * @param password
@@ -74,7 +79,8 @@ public class EmailHelper {
   }
 
   /**
-   * Gets a javax.mail.Session for MSN/LIVE/HOTMAIL. When you send your e-mail, the from address will be forced to the username you give here.
+   * Gets a javax.mail.Session for MSN/LIVE/HOTMAIL. When you send your e-mail, the from address will be forced to the
+   * username you give here.
    *
    * @param username
    * @param password
@@ -97,9 +103,9 @@ public class EmailHelper {
   }
 
   /**
-   * Gets a javax.mail.Session for Yahoo! When you send your e-mail, the from address must be the same as the
-   * address you've signed into here or you'll get this error: com.sun.mail.smtp.SMTPSendFailedException: 553
-   * From address not verified...
+   * Gets a javax.mail.Session for Yahoo! When you send your e-mail, the from address must be the same as the address
+   * you've signed into here or you'll get this error: com.sun.mail.smtp.SMTPSendFailedException: 553 From address not
+   * verified...
    *
    * @param username
    * @param password
@@ -181,5 +187,29 @@ public class EmailHelper {
     attachmentPart.setDataHandler(new DataHandler(source));
     attachmentPart.setFileName(filename);
     return attachmentPart;
+  }
+
+  /**
+   * Creates a zip of the given EmailAttachments and returns an EmailAttachment of that zip with the given name.
+   *
+   * @param attachmentName the name of the newly created EmailAttachment
+   * @param attachments the attachment(s) to be zipped
+   * @return the zipped version of the given attachment(s)
+   * @throws FileNotFoundException
+   * @throws IOException
+   * @throws Exception
+   */
+  public static EmailAttachment zipAttachments(String attachmentName, EmailAttachment... attachments) throws FileNotFoundException, IOException, Exception {
+    HelperFile[] files = new HelperFile[attachments.length];
+    for (int i = 0; i < attachments.length; i++) {
+      EmailAttachment emailAttachment = attachments[i];
+      byte[] fileBytes = emailAttachment.getFileBytes();
+      if (fileBytes == null) {
+        fileBytes = IOHelper.getFileBytes(emailAttachment.getFile()); //in the case that this is a file on disk
+      }
+      files[i] = new HelperFile(fileBytes, emailAttachment.getAttachmentName());
+    }
+    byte[] zipFiles = IOHelper.zipFiles(files);
+    return new EmailAttachment(zipFiles, "attachments.zip");
   }
 }
