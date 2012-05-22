@@ -1,5 +1,10 @@
 package com.kentcdodds.javahelper.helpers;
 
+import com.kentcdodds.javahelper.model.Email;
+import com.kentcdodds.javahelper.model.EmailAttachment;
+import com.kentcdodds.javahelper.model.HelperFile;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Properties;
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
@@ -9,13 +14,6 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import javax.mail.util.ByteArrayDataSource;
-import com.kentcdodds.javahelper.model.Email;
-import com.kentcdodds.javahelper.model.EmailAttachment;
-import com.kentcdodds.javahelper.model.HelperFile;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  *
@@ -209,7 +207,7 @@ public class EmailHelper {
       }
       files[i] = new HelperFile(fileBytes, emailAttachment.getAttachmentName());
     }
-    byte[] zipFiles = IOHelper.zipFiles(files);
-    return new EmailAttachment(zipFiles, "attachments.zip");
+    byte[] zippedBytes = IOHelper.zipFiles(files);
+    return new EmailAttachment(zippedBytes, "attachments.zip");
   }
 }
