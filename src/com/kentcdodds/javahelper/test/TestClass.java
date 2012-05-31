@@ -1,6 +1,7 @@
 package com.kentcdodds.javahelper.test;
 
 import com.kentcdodds.javahelper.helpers.*;
+import com.kentcdodds.javahelper.helpers.OracleHelper.QueryParameter;
 import com.kentcdodds.javahelper.model.Email;
 import com.kentcdodds.javahelper.model.EmailAttachment;
 import com.kentcdodds.javahelper.model.HelperFile;
@@ -12,6 +13,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
+import java.sql.ResultSet;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -37,11 +39,22 @@ public class TestClass {
 
   public static void main(String[] args) throws Exception {
     setStuff();
-//    O
+    Map<String, String> props = new TreeMap<>();
+    try (Scanner scan = new Scanner(System.in)) {
+      PrinterHelper.print("user: ");
+      props.put("user", scan.nextLine());
+      PrinterHelper.print("password: ");
+      props.put("password", scan.nextLine());
+      PrinterHelper.print("jdbc url: ");
+      ResultSet rs = OracleHelper.executeQuery(scan.nextLine(), props, "select * from ?", new QueryParameter(QueryParameter.STRING, "dual"));
+      while (rs.next()) {
+        System.out.println(rs.getString(1));
+      }
+    }
 //    progressImage();
     System.exit(0);
   }
-  
+
   public static void progressImage() throws IOException, InterruptedException {
     URL url = new URL(progressImageUrl);
     java.awt.Image image = Toolkit.getDefaultToolkit().createImage(url);

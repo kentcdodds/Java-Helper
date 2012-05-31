@@ -38,7 +38,7 @@ public class OracleHelper {
    * @throws DataException
    * @throws SQLException
    */
-  public ResultSet executeQuery(String connectionUrl, Map<String, String> properties, String query, QueryParameter... params) throws SQLException, Exception {
+  public static ResultSet executeQuery(String connectionUrl, Map<String, String> properties, String query, QueryParameter... params) throws SQLException, Exception {
     setDefaultConnection(new HelperConnection(connectionUrl, properties));
     return executeQuery(getDefaultConnection(), query, params);
   }
@@ -51,7 +51,7 @@ public class OracleHelper {
    * @throws DataException
    * @throws SQLException
    */
-  public ResultSet executeQuery(String query, QueryParameter... params) throws SQLException, Exception {
+  public static ResultSet executeQuery(String query, QueryParameter... params) throws SQLException, Exception {
     return executeQuery(getDefaultConnection(), query, params);
   }
 
@@ -63,12 +63,12 @@ public class OracleHelper {
    * @throws DataException
    * @throws SQLException
    */
-  public ResultSet executeQuery(HelperConnection helperConnection, String query, QueryParameter... params) throws SQLException {
-    PrinterHelper.print("The connection is: " + helperConnection.getJdbcURL());
-    PrinterHelper.print("The query is: " + query);
+  public static ResultSet executeQuery(HelperConnection helperConnection, String query, QueryParameter... params) throws SQLException {
+    PrinterHelper.println("The connection is: " + helperConnection.getJdbcURL());
+    PrinterHelper.println("The query is: " + query);
     if (params.length > 0) {
-      PrinterHelper.print("The QueryParameters are:");
-      PrinterHelper.print("\t" + StringHelper.splitBy(StringHelper.newline + "\t", params));
+      PrinterHelper.println("The QueryParameters are:");
+      PrinterHelper.println("\t" + StringHelper.splitBy(StringHelper.newline + "\t", params));
     }
     Connection conn = helperConnection.createOracleConnection();
     PreparedStatement pstmt = conn.prepareStatement(query);
@@ -92,7 +92,7 @@ public class OracleHelper {
   }
 
   //<editor-fold defaultstate="collapsed" desc="HelperConnection">
-  public class HelperConnection {
+  public static class HelperConnection {
 
     private String jdbcURL = null;
     private Map<String, String> properties = null;
@@ -163,7 +163,7 @@ public class OracleHelper {
   //</editor-fold>
 
   //<editor-fold defaultstate="collapsed" desc="Query Parameter">
-  public class QueryParameter {
+  public static class QueryParameter {
 
     public static final int STRING = 100;
     public static final int CLOB = 101;
