@@ -37,7 +37,8 @@ public class TestClass {
 
   public static void main(String[] args) throws Exception {
     setStuff();
-    progressImage();
+//    O
+//    progressImage();
     System.exit(0);
   }
   

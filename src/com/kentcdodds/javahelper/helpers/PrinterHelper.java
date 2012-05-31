@@ -3,12 +3,14 @@ package com.kentcdodds.javahelper.helpers;
 import com.kentcdodds.javahelper.extras.MessageConsole;
 import java.awt.Color;
 import java.io.PrintStream;
-import javax.swing.*;
+import javax.swing.JDialog;
+import javax.swing.JScrollPane;
+import javax.swing.JTextPane;
 
 /**
- * Good for debugging, this class allows you to send your prints somewhere and change whether it all prints.
- * Sometimes you want to reduce the amount your code prints to isolate a problem. This way you just set the
- * PrintHelper instance.setPrint(true) and it'll print everything you send to the printALot method.
+ * Good for debugging, this class allows you to send your prints somewhere and change whether it all prints. Sometimes
+ * you want to reduce the amount your code prints to isolate a problem. This way you just set the PrintHelper
+ * instance.setPrint(true) and it'll print everything you send to the printALot method.
  *
  * @author Kent
  */
@@ -47,6 +49,7 @@ public class PrinterHelper {
     return instance;
   }
 
+  //<editor-fold defaultstate="collapsed" desc="Print">
   /**
    * Prints the given String if the print variable is true
    *
@@ -54,10 +57,32 @@ public class PrinterHelper {
    */
   public static void print(Object object) {
     if (getInstance().isPrint()) {
+      System.out.print(object);
+    }
+  }
+
+  /**
+   * Prints the given String followed by a new line if the print variable is true
+   *
+   * @param object to print
+   */
+  public static void println(Object object) {
+    if (getInstance().isPrint()) {
       System.out.println(object);
     }
   }
 
+  /**
+   * Prints a new line if Print on the current instance is true
+   */
+  public static void println() {
+    if (getInstance().isPrint()) {
+      System.out.println();
+    }
+  }
+  //</editor-fold>
+
+  //<editor-fold defaultstate="collapsed" desc="Print Err">
   /**
    * Prints the given String in error type if the print variable is true
    *
@@ -65,27 +90,30 @@ public class PrinterHelper {
    */
   public static void printErr(Object object) {
     if (getInstance().isPrint()) {
-      System.err.println(object);
+      System.err.print(object);
     }
   }
 
   /**
-   * Prints a new line if Print on the current instance is true
+   * Prints the given String followed by a newline in error type if the print variable is true
+   *
+   * @param object to print
    */
-  public static void print() {
+  public static void printErrln(Object object) {
     if (getInstance().isPrint()) {
-      System.out.println();
+      System.err.println(object);
     }
   }
 
   /**
    * Prints a new error line if Print on the current instance is true
    */
-  public static void printErr() {
+  public static void printErrln() {
     if (getInstance().isPrint()) {
       System.err.println();
     }
   }
+  //</editor-fold>
 
   /**
    * Convenience method. sets the dialog title and then calls showMessageConsole()
@@ -105,8 +133,7 @@ public class PrinterHelper {
   }
 
   /**
-   * Shows the output window and sends all messages sent to PrintHelper via print methods to this window as
-   * well.
+   * Shows the output window and sends all messages sent to PrintHelper via print methods to this window as well.
    */
   public static void showMessageConsole() {
     showMessageConsole(getInstance().getOutputDialog().getTitle());
