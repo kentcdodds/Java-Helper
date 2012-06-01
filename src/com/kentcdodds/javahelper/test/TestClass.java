@@ -7,9 +7,9 @@ import com.kentcdodds.javahelper.model.EmailAttachment;
 import com.kentcdodds.javahelper.model.HelperFile;
 import java.awt.Image;
 import java.awt.Toolkit;
-import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
@@ -36,23 +36,40 @@ public class TestClass {
   public static String testImageLocation = "/com/kentcdodds/javahelper/resources/iSayHiGuy.jpg";
   public static String progressImageUrl = "http://c96265.r65.cf3.rackcdn.com/indicator_medium.gif";
   public static File ioPlaygroundDir = new File(IOHelper.homeDir + "\\IOPlayground\\");
+  public static String prodDatabaseUrl;
+  public static String devDatabaseUrl;
+  public static String dbPassword;
+  public static String dbUser;
 
   public static void main(String[] args) throws Exception {
     setStuff();
     Map<String, String> props = new TreeMap<>();
-    try (Scanner scan = new Scanner(System.in)) {
-      PrinterHelper.print("user: ");
-      props.put("user", scan.nextLine());
-      PrinterHelper.print("password: ");
-      props.put("password", scan.nextLine());
-      PrinterHelper.print("jdbc url: ");
-      ResultSet rs = OracleHelper.executeQuery(scan.nextLine(), props, "select * from ?", new QueryParameter(QueryParameter.STRING, "dual"));
-      while (rs.next()) {
-        System.out.println(rs.getString(1));
-      }
+    props.put("user", dbUser);
+    props.put("password", dbPassword);
+    ResultSet rs = OracleHelper.executeQuery(devDatabaseUrl, props, "select 'h' \"question\" from dual", new QueryParameter(QueryParameter.STRING, "sup?"));
+    while (rs.next()) {
+      System.out.println(rs.getString(1));
     }
 //    progressImage();
     System.exit(0);
+  }
+
+  /**
+   * The stuff I want to set at the beginning of all my tests. Loads a properties file which holds the values to
+   * personal variables (passwords, etc.)
+   */
+  public static void setStuff() throws IOException {
+    SwingHelper.setSystemLookAndFeel();
+    PrinterHelper.setInstancePrint(true);
+    Properties prop = new Properties();
+
+    prop.load(new FileInputStream("../java-helper.properties"));
+
+    devDatabaseUrl = prop.getProperty("devDatabase");
+    prodDatabaseUrl = prop.getProperty("prodDatabase");
+    dbPassword = OtherHelper.descrambleString(prop.getProperty("dbScrambledPassword"));
+    dbUser = prop.getProperty("dbUser");
+
   }
 
   public static void progressImage() throws IOException, InterruptedException {
@@ -247,14 +264,6 @@ public class TestClass {
     EmailHelper.sendEmail(session, email);
 //    System.out.println(ReflectionHelper.getObjectInString(email, true, 1, true, 1));
     System.out.println("Email sent!");
-  }
-
-  /**
-   * The stuff I want to set at the beginning of all my tests.
-   */
-  public static void setStuff() {
-    SwingHelper.setSystemLookAndFeel();
-    PrinterHelper.setInstancePrint(true);
   }
 
   /**
