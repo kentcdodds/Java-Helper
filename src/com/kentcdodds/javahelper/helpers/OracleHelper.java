@@ -1,5 +1,10 @@
 package com.kentcdodds.javahelper.helpers;
 
+import au.com.bytecode.opencsv.CSVWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.sql.*;
 import java.util.Map;
 import java.util.Properties;
@@ -91,11 +96,45 @@ public class OracleHelper {
     return rs;
   }
 
+  /**
+   * Prints the given ResultSet to a comma separated file (the destination)
+   *
+   * @param rs
+   * @param destination
+   * @throws SQLException
+   * @throws FileNotFoundException
+   */
+  public static void resultSetToCSVFile(ResultSet rs, String destination) throws SQLException, FileNotFoundException, IOException {
+    ResultSetMetaData metaData = rs.getMetaData();
+    int columnCount = metaData.getColumnCount();
+    String[] header = new String[columnCount];
+    for (int i = 0; i < columnCount; i++) {
+      header[i] = metaData.getColumnName(i + 1);
+    }
+    File file = new File(destination);
+    IOHelper.checkDirectory(file);
+    try (PrintWriter pw = new PrintWriter(file); CSVWriter writer = new CSVWriter(pw)) {
+      writer.writeNext(header);
+      while (rs.next()) {
+        String[] row = new String[columnCount];
+        for (int i = 0; i < columnCount; i++) {
+          String string = rs.getString(i + 1);
+          if (string == null) {
+            string = "";
+          }
+          row[i] = string;
+        }
+        writer.writeNext(row);
+      }
+    }
+  }
+
   //<editor-fold defaultstate="collapsed" desc="HelperConnection">
   public static class HelperConnection {
 
     private String jdbcURL = null;
     private Map<String, String> properties = null;
+    private Connection connection = null;
 
     /**
      * Empty constructor, be sure to set jdbcURL and properties map
@@ -123,13 +162,16 @@ public class OracleHelper {
      * @throws Exception
      */
     public Connection createOracleConnection() throws SQLException {
-      Properties connectionProps = new Properties();
-      for (Map.Entry<String, String> entry : properties.entrySet()) {
-        connectionProps.put(entry.getKey(), entry.getValue());
+      if (connection == null
+              || connection.isClosed()) {
+        Properties connectionProps = new Properties();
+        for (Map.Entry<String, String> entry : properties.entrySet()) {
+          connectionProps.put(entry.getKey(), entry.getValue());
+        }
+        connection = DriverManager.getConnection(jdbcURL, connectionProps);
+        connection.setAutoCommit(false);
       }
-      Connection conn = DriverManager.getConnection(jdbcURL, connectionProps);
-      conn.setAutoCommit(false);
-      return conn;
+      return connection;
     }//createConnection
 
     /**
