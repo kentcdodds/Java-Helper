@@ -1,7 +1,6 @@
 package com.kentcdodds.javahelper.test;
 
 import com.kentcdodds.javahelper.helpers.*;
-import com.kentcdodds.javahelper.helpers.OracleHelper.QueryParameter;
 import com.kentcdodds.javahelper.model.Email;
 import com.kentcdodds.javahelper.model.EmailAttachment;
 import com.kentcdodds.javahelper.model.HelperFile;
@@ -14,6 +13,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -43,15 +43,6 @@ public class TestClass {
 
   public static void main(String[] args) throws Exception {
     setStuff();
-    Map<String, String> props = new TreeMap<>();
-    props.put("user", dbUser);
-    props.put("password", dbPassword);
-    ResultSet rs = OracleHelper.executeQuery(devDatabaseUrl, props, "select 'h' \"question\" from dual");
-    OracleHelper.resultSetToCSVFile(rs, ioPlaygroundDir.getPath() +"test.csv");
-    while (rs.next()) {
-      System.out.println(rs.getString(1));
-    }
-//    progressImage();
     System.exit(0);
   }
 
@@ -71,6 +62,14 @@ public class TestClass {
     dbPassword = OtherHelper.descrambleString(prop.getProperty("dbScrambledPassword"));
     dbUser = prop.getProperty("dbUser");
 
+  }
+  
+  public static void executeOracleQuery() throws SQLException, Exception {
+    Map<String, String> props = new TreeMap<>();
+    props.put("user", dbUser);
+    props.put("password", dbPassword);
+    ResultSet rs = OracleHelper.executeQuery(devDatabaseUrl, props, "select 'h' \"question\" from dual");
+    OracleHelper.resultSetToCSVFile(rs, ioPlaygroundDir.getPath() +"test.csv");
   }
 
   public static void progressImage() throws IOException, InterruptedException {
