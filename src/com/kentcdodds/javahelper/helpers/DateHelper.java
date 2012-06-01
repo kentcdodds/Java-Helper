@@ -1,8 +1,10 @@
 package com.kentcdodds.javahelper.helpers;
 
+import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -17,10 +19,9 @@ public class DateHelper {
   private static SimpleDateFormat dateFormatter = new SimpleDateFormat("MMM d, yyyy");
 
   /**
-   * Gives the difference in days between the two days. This does not round up, so, if you were to give it
-   * January 1st, 2012 12:00:00.000 and January 2nd, 2012 11:59:59.999 it would return 0 because the
-   * milliseconds difference between those is not full day. If you would rather have this functionality, use
-   * the getDaysDifference method.
+   * Gives the difference in days between the two days. This does not round up, so, if you were to give it January 1st,
+   * 2012 12:00:00.000 and January 2nd, 2012 11:59:59.999 it would return 0 because the milliseconds difference between
+   * those is not full day. If you would rather have this functionality, use the getDaysDifference method.
    *
    * @param oldDate
    * @param recentDate
@@ -32,10 +33,10 @@ public class DateHelper {
   }
 
   /**
-   * Gets the days difference. This is different than getAbsoluteDaysDifference because this will not take
-   * anything smaller than the day into account (so, for example, if you give it December 31st, 1999 at
-   * 23:59:59.999 and January 1st, 2000 at 00:00:00.000 it will return 1, whereas getAbsoluteDaysDifference on
-   * those days would return 0 because the actual difference between those two times is 1 millisecond
+   * Gets the days difference. This is different than getAbsoluteDaysDifference because this will not take anything
+   * smaller than the day into account (so, for example, if you give it December 31st, 1999 at 23:59:59.999 and January
+   * 1st, 2000 at 00:00:00.000 it will return 1, whereas getAbsoluteDaysDifference on those days would return 0 because
+   * the actual difference between those two times is 1 millisecond
    *
    * @param oldDate
    * @param recentDate
@@ -61,10 +62,9 @@ public class DateHelper {
   }
 
   /**
-   * Gets the days since 0 by creating a calendar instance, setting the era and then iterating from 0 to the
-   * given year getting the maximum day of the year for each of those years and adding that number until
-   * finally it reaches the year given and then adds the dayOfYear given. Returns negative if the era != 1;
-   * (which is AD)
+   * Gets the days since 0 by creating a calendar instance, setting the era and then iterating from 0 to the given year
+   * getting the maximum day of the year for each of those years and adding that number until finally it reaches the
+   * year given and then adds the dayOfYear given. Returns negative if the era != 1; (which is AD)
    *
    * @param era
    * @param yearOfEra
@@ -81,6 +81,20 @@ public class DateHelper {
     }
     days += dayOfYear;
     return (era == 1) ? days : -days;
+  }
+
+  /**
+   * Converts a long time in nanoseconds to a formatted timestamp. Useful for timing operations. Simply use long begin =
+   * System.nanoTime(); ...some operation... long end = System.nanoTime(); nanoToString(end - begin);
+   *
+   * @param nanoseconds
+   * @return
+   */
+  public static String nanosecondsToString(long nanoseconds) {
+    Timestamp ts = new Timestamp(TimeUnit.MILLISECONDS.convert(nanoseconds, TimeUnit.NANOSECONDS));
+    SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss:SSS");
+    format.setTimeZone(TimeZone.getTimeZone("UTC"));
+    return format.format(ts);
   }
 
   /**
