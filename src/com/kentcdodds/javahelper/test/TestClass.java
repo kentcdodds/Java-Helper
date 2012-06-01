@@ -46,7 +46,8 @@ public class TestClass {
     Map<String, String> props = new TreeMap<>();
     props.put("user", dbUser);
     props.put("password", dbPassword);
-    ResultSet rs = OracleHelper.executeQuery(devDatabaseUrl, props, "select 'h' \"question\" from dual", new QueryParameter(QueryParameter.STRING, "sup?"));
+    ResultSet rs = OracleHelper.executeQuery(devDatabaseUrl, props, "select 'h' \"question\" from dual");
+    OracleHelper.resultSetToCSVFile(rs, ioPlaygroundDir.getPath() +"test.csv");
     while (rs.next()) {
       System.out.println(rs.getString(1));
     }
