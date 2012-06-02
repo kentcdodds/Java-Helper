@@ -1,13 +1,20 @@
 package com.kentcdodds.javahelper.helpers;
 
 import au.com.bytecode.opencsv.CSVWriter;
+import com.kentcdodds.javahelper.model.HelperConnection;
+import com.kentcdodds.javahelper.model.HelperQuery;
+import com.kentcdodds.javahelper.model.QueryParameter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.*;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import oracle.sql.CLOB;
 
 /**
@@ -17,6 +24,7 @@ import oracle.sql.CLOB;
 public class OracleHelper {
 
   private static HelperConnection defaultConnection = null;
+  private static java.util.Map<String, HelperConnection> allConnectionsMap;
 
   /**
    * @return the defaultConnection
@@ -29,6 +37,8 @@ public class OracleHelper {
   }
 
   /**
+   * Note, the given default connection is not put to the allConnectionsMap.
+   *
    * @param aDefaultConnection the defaultConnection to set
    */
   public static void setDefaultConnection(HelperConnection aDefaultConnection) {
@@ -36,64 +46,80 @@ public class OracleHelper {
   }
 
   /**
-   * Executes the given query. Very simple, doesn't check anything, so be careful using this!
+   * Sets the default connection to a new HelperConnection with the connectionURL and the properties, then creates a
+   * HelperQuery out of the default connection, query, and params. Then calls execute on the helperQuery
    *
-   * @param query
-   * @return
-   * @throws DataException
+   * @param connectionUrl the url to use to create the connection
+   * @param properties the properties to apply to the connection
+   * @param query the query to execute
+   * @param params the parameters to add to the prepared statement created by connection and query
+   * @return the results of helperQuery.execute();
    * @throws SQLException
    */
-  public static ResultSet executeQuery(String connectionUrl, Map<String, String> properties, String query, QueryParameter... params) throws SQLException, Exception {
+  public static ResultSet executeQuery(String connectionUrl, Map<String, String> properties, String query, QueryParameter... params) throws SQLException {
     setDefaultConnection(new HelperConnection(connectionUrl, properties));
-    return executeQuery(getDefaultConnection(), query, params);
+    HelperQuery helperQuery = null;
+    try {
+      helperQuery = new HelperQuery(getDefaultConnection(), query, params);
+    } catch (Exception ex) { //This is caught here instead of thrown because this should never be a problem.
+      //The only reason an exception is thrown here is because getDefaultConnection() throws an error if the default connection is not set.
+      //However, it is set in this method, so it is caught so it doesn't have to be hadled later.
+      Logger.getLogger(OracleHelper.class.getName()).log(Level.SEVERE, null, ex);
+    }
+    if (helperQuery == null) {
+      return null;
+    }
+    return helperQuery.execute();
   }
 
   /**
-   * Executes the given query. Very simple, doesn't check anything, so be careful using this!
+   * Creates a new HelperQuery out of the default connection, query, and params and calls helperQuery.execute();
    *
-   * @param query
-   * @return
-   * @throws DataException
-   * @throws SQLException
+   * @param query the query to be run
+   * @param params parameters to apply to the prepared statement created by the query and default connection
+   * @return the results of helperQuery.execute();
+   * @throws SQLException when executing the query
+   * @throws Exception when getting the default connection if it is not set.
    */
   public static ResultSet executeQuery(String query, QueryParameter... params) throws SQLException, Exception {
-    return executeQuery(getDefaultConnection(), query, params);
+    HelperQuery helperQuery = new HelperQuery(getDefaultConnection(), query, params);
+    return helperQuery.execute();
   }
 
   /**
-   * Executes the given query. Very simple, doesn't check anything, so be careful using this!
+   * Creates a HelperQuery out of the given HelperConnection, query, and params and calls helperQuery.execute();
    *
-   * @param query
-   * @return
+   * @param helperConnection the HelperConnection to run the query with
+   * @param query the query to be run
+   * @param params the parameters to apply to the statement created by the query and the connection
+   * @return the results of helperQuery.execute();
    * @throws DataException
    * @throws SQLException
    */
   public static ResultSet executeQuery(HelperConnection helperConnection, String query, QueryParameter... params) throws SQLException {
-    PrinterHelper.println("The connection is: " + helperConnection.getJdbcURL());
-    PrinterHelper.println("The query is: " + query);
-    if (params.length > 0) {
-      PrinterHelper.println("The QueryParameters are:");
-      PrinterHelper.println("\t" + StringHelper.splitBy(StringHelper.newline + "\t", params));
-    }
-    Connection conn = helperConnection.createOracleConnection();
-    PreparedStatement pstmt = conn.prepareStatement(query);
-    for (int i = 1; i <= params.length; i++) {
-      QueryParameter param = params[i - 1];
-      switch (param.getType()) {
-        case QueryParameter.CLOB:
-          Clob clob = CLOB.createTemporary(conn, false, CLOB.DURATION_SESSION);
-          clob.setString(i, param.getValue());
-          pstmt.setClob(i, clob);
-          break;
-        case QueryParameter.STRING:
-          pstmt.setString(i, param.getValue());
-          break;
-      }
-    }
+    HelperQuery helperQuery = new HelperQuery(helperConnection, query, params);
+    return helperQuery.execute();
+  }
 
-    ResultSet rs = pstmt.executeQuery();
-    conn.commit();
-    return rs;
+  /**
+   * Gets the helperConnection out of the allConnectionsMap based on the given helperConnectionName. Then creates a
+   * HelperQuery out of the HelperConnection and the given query and params and calls helperQuery.execute(); Returns
+   * null if the allConnectionsMap does not return a connection by the given name.
+   *
+   * @param helperConnectionName the HelperConnection to run the query with
+   * @param query the query to be run
+   * @param params the parameters to apply to the statement created by the query and the connection
+   * @return the results of helperQuery.execute();
+   * @throws DataException
+   * @throws SQLException
+   */
+  public static ResultSet executeQuery(String helperConnectionName, String query, QueryParameter... params) throws SQLException {
+    HelperConnection helperConnection = getAllConnectionsMap().get(helperConnectionName);
+    if (helperConnection == null) {
+      return null;
+    }
+    HelperQuery helperQuery = new HelperQuery(helperConnection, query, params);
+    return helperQuery.execute();
   }
 
   /**
@@ -129,139 +155,51 @@ public class OracleHelper {
     }
   }
 
-  //<editor-fold defaultstate="collapsed" desc="HelperConnection">
-  public static class HelperConnection {
-
-    private String jdbcURL = null;
-    private Map<String, String> properties = null;
-    private Connection connection = null;
-
-    /**
-     * Empty constructor, be sure to set jdbcURL and properties map
-     */
-    public HelperConnection() {
-    }
-
-    /**
-     * Full constructor
-     *
-     * @param jdbcURL
-     * @param properties
-     */
-    public HelperConnection(String jdbcURL, Map<String, String> properties) {
-      this.jdbcURL = jdbcURL;
-      this.properties = properties;
-    }
-
-    /**
-     * Creates a connection on the url with the given props
-     *
-     * @param url
-     * @param props
-     * @return
-     * @throws Exception
-     */
-    public Connection createOracleConnection() throws SQLException {
-      if (connection == null
-              || connection.isClosed()) {
-        Properties connectionProps = new Properties();
-        for (Map.Entry<String, String> entry : properties.entrySet()) {
-          connectionProps.put(entry.getKey(), entry.getValue());
-        }
-        connection = DriverManager.getConnection(jdbcURL, connectionProps);
-        connection.setAutoCommit(false);
-      }
-      return connection;
-    }//createConnection
-
-    /**
-     * @return the jdbcURL
-     */
-    public String getJdbcURL() {
-      return jdbcURL;
-    }
-
-    /**
-     * @param jdbcURL the jdbcURL to set
-     */
-    public void setJdbcURL(String jdbcURL) {
-      this.jdbcURL = jdbcURL;
-    }
-
-    /**
-     * @return the properties
-     */
-    public Map<String, String> getProperties() {
-      return properties;
-    }
-
-    /**
-     * @param properties the properties to set
-     */
-    public void setProperties(Map<String, String> properties) {
-      this.properties = properties;
-    }
+  /**
+   * Gets the helper connection out of the map by the given name.
+   *
+   * @param name
+   * @return
+   */
+  public static HelperConnection getHelperConnection(String name) {
+    return getAllConnectionsMap().get(name);
   }
-  //</editor-fold>
 
-  //<editor-fold defaultstate="collapsed" desc="Query Parameter">
-  public static class QueryParameter {
-
-    public static final int STRING = 100;
-    public static final int CLOB = 101;
-    private int type = -1;
-    private String value = null;
-
-    /**
-     * Constructor for QueryParameter
-     */
-    public QueryParameter(int type, String value) {
-      this.type = type;
-      this.value = value;
-    }
-
-    /**
-     * @return the type
-     */
-    public int getType() {
-      return type;
-    }
-
-    /**
-     * @param type the type to set
-     */
-    public void setType(int type) {
-      this.type = type;
-    }
-
-    /**
-     * @return the value
-     */
-    public String getValue() {
-      return value;
-    }
-
-    /**
-     * @param value the value to set
-     */
-    public void setValue(String value) {
-      this.value = value;
-    }
-
-    public String getTypeString() {
-      switch (type) {
-        case STRING:
-          return "String";
-        case CLOB:
-          return "Clob";
-      }
-      return "Unknown (" + type + ")";
-    }
-
-    @Override
-    public String toString() {
-      return getTypeString() + " - " + value;
-    }
+  /**
+   * Puts the given helperConnection into the allConnectionsMap mapped by the given name.
+   *
+   * @param name
+   * @param helperConnection
+   * @return
+   */
+  public static HelperConnection putHelperConnection(String name, HelperConnection helperConnection) {
+    return getAllConnectionsMap().put(name, helperConnection);
   }
-  //</editor-fold>
+
+  /**
+   * Adds all the given helperConnections to the allConnectionsMap
+   *
+   * @param helperConnectionMap
+   */
+  public static void putAllHelperConnections(java.util.Map<String, HelperConnection> helperConnectionMap) {
+    getAllConnectionsMap().putAll(helperConnectionMap);
+  }
+
+  /**
+   * @return the allConnectionsMap
+   */
+  public static java.util.Map<String, HelperConnection> getAllConnectionsMap() {
+    if (allConnectionsMap == null) {
+      allConnectionsMap = new java.util.TreeMap<>();
+    }
+    return allConnectionsMap;
+  }
+
+  /**
+   * @param aAllConnectionsMap the allConnectionsMap to set
+   */
+  public static void setAllConnectionsMap(java.util.Map<String, HelperConnection> aAllConnectionsMap) {
+    allConnectionsMap = aAllConnectionsMap;
+  }
+
 }
