@@ -1,7 +1,8 @@
 package com.kentcdodds.javahelper.model;
 
 /**
- * 
+ * Javabean for the OracleHelper. Used in HelperQuery.
+ *
  * @author kentcdodds
  */
 public class QueryParameter {
