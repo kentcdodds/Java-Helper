@@ -58,18 +58,15 @@ public class OracleHelper {
    */
   public static ResultSet executeQuery(String connectionUrl, Map<String, String> properties, String query, QueryParameter... params) throws SQLException {
     setDefaultConnection(new HelperConnection(connectionUrl, properties));
-    HelperQuery helperQuery = null;
+    HelperQuery helperQuery = new HelperQuery(query, params);
     try {
-      helperQuery = new HelperQuery(getDefaultConnection(), query, params);
+      return getDefaultConnection().executeQuery(helperQuery);
     } catch (Exception ex) { //This is caught here instead of thrown because this should never be a problem.
       //The only reason an exception is thrown here is because getDefaultConnection() throws an error if the default connection is not set.
       //However, it is set in this method, so it is caught so it doesn't have to be hadled later.
       Logger.getLogger(OracleHelper.class.getName()).log(Level.SEVERE, null, ex);
-    }
-    if (helperQuery == null) {
       return null;
     }
-    return helperQuery.execute();
   }
 
   /**
@@ -82,8 +79,8 @@ public class OracleHelper {
    * @throws Exception when getting the default connection if it is not set.
    */
   public static ResultSet executeQuery(String query, QueryParameter... params) throws SQLException, Exception {
-    HelperQuery helperQuery = new HelperQuery(getDefaultConnection(), query, params);
-    return helperQuery.execute();
+    HelperQuery helperQuery = new HelperQuery(query, params);
+    return getDefaultConnection().executeQuery(helperQuery);
   }
 
   /**
@@ -97,8 +94,8 @@ public class OracleHelper {
    * @throws SQLException
    */
   public static ResultSet executeQuery(HelperConnection helperConnection, String query, QueryParameter... params) throws SQLException {
-    HelperQuery helperQuery = new HelperQuery(helperConnection, query, params);
-    return helperQuery.execute();
+    HelperQuery helperQuery = new HelperQuery(query, params);
+    return helperConnection.executeQuery(helperQuery);
   }
 
   /**
@@ -118,8 +115,8 @@ public class OracleHelper {
     if (helperConnection == null) {
       return null;
     }
-    HelperQuery helperQuery = new HelperQuery(helperConnection, query, params);
-    return helperQuery.execute();
+    HelperQuery helperQuery = new HelperQuery(query, params);
+    return helperConnection.executeQuery(helperQuery);
   }
 
   /**
@@ -201,5 +198,4 @@ public class OracleHelper {
   public static void setAllConnectionsMap(java.util.Map<String, HelperConnection> aAllConnectionsMap) {
     allConnectionsMap = aAllConnectionsMap;
   }
-
 }
