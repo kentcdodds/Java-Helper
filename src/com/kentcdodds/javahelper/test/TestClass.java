@@ -1,9 +1,7 @@
 package com.kentcdodds.javahelper.test;
 
 import com.kentcdodds.javahelper.helpers.*;
-import com.kentcdodds.javahelper.model.Email;
-import com.kentcdodds.javahelper.model.EmailAttachment;
-import com.kentcdodds.javahelper.model.HelperFile;
+import com.kentcdodds.javahelper.model.*;
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
@@ -40,9 +38,21 @@ public class TestClass {
   public static String devDatabaseUrl;
   public static String dbPassword;
   public static String dbUser;
+  public static Map<String, String> properties;
 
   public static void main(String[] args) throws Exception {
     setStuff();
+    HelperConnection helperConnection = new HelperConnection(devDatabaseUrl, properties);
+    helperConnection.addQueryToQueue(new HelperQuery("select * from dual"));
+    helperConnection.addQueryToQueue(new HelperQuery("select * from dual"));
+    helperConnection.addQueryToQueue(new HelperQuery("select * from dual"));
+    helperConnection.addQueryToQueue(new HelperQuery("select * from dual"));
+    List<HelperQuery> executeQueue = helperConnection.executeQueue();
+    for (int i = 0; i < executeQueue.size(); i++) {
+      HelperQuery executedQuery = executeQueue.get(i);
+      PrinterHelper.println(StringHelper.newline + "Query " + i + StringHelper.newline);
+      SQLHelper.printResultSet(executedQuery.getResultSet());
+    }
     System.exit(0);
   }
 
@@ -61,15 +71,18 @@ public class TestClass {
     prodDatabaseUrl = prop.getProperty("prodDatabase");
     dbPassword = OtherHelper.descrambleString(prop.getProperty("dbScrambledPassword"));
     dbUser = prop.getProperty("dbUser");
+    properties = new TreeMap<>();
+    properties.put("user", dbUser);
+    properties.put("password", dbPassword);
 
   }
-  
+
   public static void executeOracleQuery() throws SQLException, Exception {
     Map<String, String> props = new TreeMap<>();
     props.put("user", dbUser);
     props.put("password", dbPassword);
     ResultSet rs = SQLHelper.executeQuery(devDatabaseUrl, props, "select 'h' \"question\" from dual");
-    SQLHelper.resultSetToCSVFile(rs, ioPlaygroundDir.getPath() +"test.csv");
+    SQLHelper.resultSetToCSVFile(rs, ioPlaygroundDir.getPath() + "test.csv");
   }
 
   public static void progressImage() throws IOException, InterruptedException {

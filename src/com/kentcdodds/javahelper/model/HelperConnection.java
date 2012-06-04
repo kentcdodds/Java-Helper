@@ -2,6 +2,8 @@ package com.kentcdodds.javahelper.model;
 
 import com.kentcdodds.javahelper.helpers.OtherHelper;
 import java.sql.*;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Level;
@@ -60,21 +62,63 @@ public class HelperConnection {
   }
 
   /**
-   * Executes the given HelperQuery on this connection based on the HelperQuery's query and QueryParameters
+   * Executes the given HelperQuery on this connection based on the HelperQuery's query and the first of the
+   * QueryParameters in the HelperQuery's list
    *
    * @param helperQuery
    * @return
    * @throws SQLException
    */
   public ResultSet executeQuery(HelperQuery helperQuery) throws SQLException {
-    //Prepare query
-    PreparedStatement pstmt = prepareStatement(helperQuery.getQuery());
-    fillStatement(pstmt, helperQuery.getParameters());
+    return executeQuery(helperQuery, 0);
+  }
 
-    ResultSet rs = executeStatement(pstmt);
-    queuedQueries.remove(helperQuery);
-    executedQueries.add(helperQuery);
-    helperQuery.setResultSet(rs);
+  /**
+   * Executes the given HelperQuery on this connection based on the HelperQuery's query and the given QueryParameters
+   *
+   * @param helperQuery
+   * @return
+   * @throws SQLException
+   */
+  public ResultSet executeQuery(HelperQuery helperQuery, QueryParameter... parameters) throws SQLException {
+    PreparedStatement pstmt = prepareStatement(helperQuery.getQuery());
+    fillStatement(pstmt, parameters);
+    return executeQueryHelper(helperQuery, pstmt);
+  }
+
+  /**
+   * Executes the given HelperQuery on this connection based on the HelperQuery's query and the pos (1st, 2nd, 3rd,
+   * etc.) QueryParameters of the HelperQuery's QueryParameter list
+   *
+   * @param helperQuery
+   * @return
+   * @throws SQLException
+   */
+  public ResultSet executeQuery(HelperQuery helperQuery, int pos) throws SQLException {
+    PreparedStatement pstmt = prepareStatement(helperQuery.getQuery());
+    fillStatement(pstmt, helperQuery.getParametersList().get(pos));
+    return executeQueryHelper(helperQuery, pstmt);
+  }
+
+  /**
+   * Used to help the executeQuery methods (because it performs the same operations for both)
+   *
+   * @param helperQuery
+   * @param pstmt
+   * @return
+   * @throws SQLException
+   */
+  private ResultSet executeQueryHelper(HelperQuery helperQuery, PreparedStatement pstmt) throws SQLException {
+    ResultSet rs = null;
+    try { //This try catch is so the query will get added to the appropriate list depending on whether the query is properly executed.
+      rs = executeStatement(pstmt);
+      helperQuery.setResultSet(rs);
+      queuedQueries.remove(helperQuery);
+      executedQueries.add(helperQuery);
+    } catch (SQLException ex) {
+      errorQueries.add(helperQuery);
+      throw ex;
+    }
     return rs;
   }
 
@@ -89,6 +133,37 @@ public class HelperConnection {
     ResultSet rs = pstmt.executeQuery();
     connection.commit();
     return rs;
+  }
+
+  /**
+   * Creates a PreparedStatement from the given helperQuery's query and fills it with batches of the HelperQuery's
+   * QueryParameters then executes the PreparedStatement in batch and returns the returned int[]
+   *
+   * @param helperQuery
+   * @return the return from PreparedStatement.executeBatch();
+   * @throws SQLException
+   */
+  public int[] executeBatchQuery(HelperQuery helperQuery) throws SQLException {
+    PreparedStatement pstmt = prepareStatement(helperQuery.getQuery());
+    List<QueryParameter[]> parametersList = helperQuery.getParametersList();
+    for (QueryParameter[] queryParameters : parametersList) {
+      fillStatement(pstmt, queryParameters);
+      pstmt.addBatch();
+    }
+    return executeBatchStatement(pstmt);
+  }
+
+  /**
+   * Executes the given statement in batch and returns the int[]
+   *
+   * @param pstmt
+   * @return the result set of the execution
+   * @throws SQLException when executing the statement
+   */
+  public int[] executeBatchStatement(PreparedStatement pstmt) throws SQLException {
+    int[] results = pstmt.executeBatch();
+    connection.commit();
+    return results;
   }
 
   /**
@@ -217,18 +292,35 @@ public class HelperConnection {
     return getOrCreateConnection().prepareStatement(query);
   }
 
+  /**
+   * Executes the queries in the queue in sequence and returns the successfully executed queries (the errored queries
+   * can be found in the error list). Catches its own errors.
+   *
+   * @return
+   */
   public java.util.List<HelperQuery> executeQueue() {
     java.util.List<HelperQuery> returnList = new java.util.ArrayList<>(queuedQueries.size());
-    for (HelperQuery helperQuery : queuedQueries) {
+    int i = 0;
+    while (i < queuedQueries.size()) {
+      HelperQuery helperQuery = queuedQueries.get(i);
       try {
         executeQuery(helperQuery);
         returnList.add(helperQuery);
       } catch (SQLException ex) {
+        i++; //If there's a failure move forward in the queue. If not, the query that ran will no longer be in the list.
         Logger.getLogger(HelperConnection.class.getName()).log(Level.SEVERE, null, ex);
       }
     }
-    OtherHelper.removeThisFromThat(returnList, queuedQueries);
     return returnList;
+  }
+
+  /**
+   * Adds the helperQuery to the queue
+   *
+   * @param helperQuery
+   */
+  public void addQueryToQueue(HelperQuery helperQuery) {
+    queuedQueries.add(helperQuery);
   }
 
   /**

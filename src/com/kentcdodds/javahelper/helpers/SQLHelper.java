@@ -50,6 +50,32 @@ public class SQLHelper {
   }
 
   /**
+   * Prints the result set to the consol.
+   * @param rs
+   * @throws SQLException 
+   */
+  public static void printResultSet(ResultSet rs) throws SQLException {
+    ResultSetMetaData metaData = rs.getMetaData();
+    int columnCount = metaData.getColumnCount();
+    String[] header = new String[columnCount];
+    for (int i = 0; i < columnCount; i++) {
+      header[i] = metaData.getColumnName(i + 1);
+    }
+    PrinterHelper.println(StringHelper.splitBy("\t", header));
+    while (rs.next()) {
+      String[] row = new String[columnCount];
+      for (int i = 0; i < columnCount; i++) {
+        String string = rs.getString(i + 1);
+        if (string == null) {
+          string = "";
+        }
+        row[i] = string;
+      }
+      PrinterHelper.println(StringHelper.splitBy("\t", row));
+    }
+  }
+
+  /**
    * Prints the given ResultSet to a comma separated file (the destination)
    *
    * @param rs

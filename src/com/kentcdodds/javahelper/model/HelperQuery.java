@@ -4,18 +4,33 @@ import java.sql.ResultSet;
 
 /**
  * Javabean for the SQLHelper. Used in HelperConnection
+ *
  * @author kentcdodds
  */
 public class HelperQuery {
 
   private String query;
-  private QueryParameter[] parameters;
+  private java.util.List<QueryParameter[]> parametersList;
   private ResultSet resultSet;
 
   /**
    * Empty Constructor. Be sure to set the query and parameters.
    */
   public HelperQuery() {
+    parametersList = new java.util.ArrayList<>();
+  }
+
+  /**
+   * Partial constructor. Fills the query parameters with one array of parameters.
+   *
+   * @param connection
+   * @param query
+   * @param parameters
+   */
+  public HelperQuery(String query, QueryParameter... parameters) {
+    this.query = query;
+    parametersList = new java.util.ArrayList<>();
+    parametersList.add(parameters);
   }
 
   /**
@@ -25,9 +40,9 @@ public class HelperQuery {
    * @param query
    * @param parameters
    */
-  public HelperQuery(String query, QueryParameter... parameters) {
+  public HelperQuery(String query, java.util.List<QueryParameter[]> parametersList) {
     this.query = query;
-    this.parameters = parameters;
+    this.parametersList = parametersList;
   }
 
   /**
@@ -47,15 +62,15 @@ public class HelperQuery {
   /**
    * @return the parameters
    */
-  public QueryParameter[] getParameters() {
-    return parameters;
+  public java.util.List<QueryParameter[]> getParametersList() {
+    return parametersList;
   }
 
   /**
    * @param parameters the parameters to set
    */
-  public void setParameters(QueryParameter[] parameters) {
-    this.parameters = parameters;
+  public void setParametersList(java.util.List<QueryParameter[]> parameters) {
+    this.parametersList = parameters;
   }
 
   /**
