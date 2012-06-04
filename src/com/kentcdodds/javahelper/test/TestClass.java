@@ -28,6 +28,7 @@ public class TestClass {
 
   public static void main(String[] args) throws Exception {
     setStuff();
+    IOHelper.sendReplaceInAllFilesToPrinter(IOHelper.replaceInAllFiles(new File("C:\\Users\\kentcdodds\\Dropbox\\Shared with home\\Netbeans Projects\\BONotifier\\src"), -3, "PrinterHelper.print", "PrinterHelper.println"));
     System.exit(0);
   }
 

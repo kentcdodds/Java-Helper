@@ -442,21 +442,25 @@ public class IOHelper {
     java.util.List<File> unappliedFiles = replaced[1];
     java.util.List<File> errorFiles = replaced[2];
     
-    PrinterHelper.println("Applied files" + StringHelper.newline + "\t");
-    PrinterHelper.println(StringHelper.splitBy(StringHelper.newline + "\t", errorFiles));
+    PrinterHelper.println("Applied files");
+    PrinterHelper.println(StringHelper.newline + "\t" + StringHelper.splitBy(StringHelper.newline + "\t", errorFiles));
     PrinterHelper.println("Total Applied Files: " + appliedFiles.size());
     
-    PrinterHelper.println(StringHelper.newline);
+    PrinterHelper.println();
     
-    PrinterHelper.println("Unapplied files" + StringHelper.newline + "\t");
-    PrinterHelper.println(StringHelper.splitBy(StringHelper.newline + "\t", unappliedFiles));
+    PrinterHelper.println("Unapplied files");
+    PrinterHelper.println(StringHelper.newline + "\t" + StringHelper.splitBy(StringHelper.newline + "\t", unappliedFiles));
     PrinterHelper.println("Total Unapplied Files: " + unappliedFiles.size());
-
-    PrinterHelper.println(StringHelper.newline);
     
-    PrinterHelper.println("Error files" + StringHelper.newline + "\t");
-    PrinterHelper.println(StringHelper.splitBy(StringHelper.newline + "\t", errorFiles));
+    PrinterHelper.println();
+
+    PrinterHelper.println("Error files");
+    PrinterHelper.println(StringHelper.newline + "\t" + StringHelper.splitBy(StringHelper.newline + "\t", errorFiles));
     PrinterHelper.println("Total Error Files: " + errorFiles.size());
+    
+    PrinterHelper.println();
+    
+    PrinterHelper.println("Total files" + (appliedFiles.size() + unappliedFiles.size() + errorFiles.size()));
   }
   //</editor-fold>
 
