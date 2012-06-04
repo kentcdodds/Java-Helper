@@ -42,17 +42,6 @@ public class TestClass {
 
   public static void main(String[] args) throws Exception {
     setStuff();
-    HelperConnection helperConnection = new HelperConnection(devDatabaseUrl, properties);
-    helperConnection.addQueryToQueue(new HelperQuery("select * from dual"));
-    helperConnection.addQueryToQueue(new HelperQuery("select * from dual"));
-    helperConnection.addQueryToQueue(new HelperQuery("select * from dual"));
-    helperConnection.addQueryToQueue(new HelperQuery("select * from dual"));
-    List<HelperQuery> executeQueue = helperConnection.executeQueue();
-    for (int i = 0; i < executeQueue.size(); i++) {
-      HelperQuery executedQuery = executeQueue.get(i);
-      PrinterHelper.println(StringHelper.newline + "Query " + i + StringHelper.newline);
-      SQLHelper.printResultSet(executedQuery.getResultSet());
-    }
     System.exit(0);
   }
 
@@ -77,7 +66,21 @@ public class TestClass {
 
   }
 
-  public static void executeOracleQuery() throws SQLException, Exception {
+  public static void executQueries() throws SQLException {
+    HelperConnection helperConnection = new HelperConnection(devDatabaseUrl, properties);
+    helperConnection.addQueryToQueue(new HelperQuery("select * from dual"));
+    helperConnection.addQueryToQueue(new HelperQuery("select * from dual"));
+    helperConnection.addQueryToQueue(new HelperQuery("select * from dual"));
+    helperConnection.addQueryToQueue(new HelperQuery("select * from dual"));
+    List<HelperQuery> executeQueue = helperConnection.executeQueue();
+    for (int i = 0; i < executeQueue.size(); i++) {
+      HelperQuery executedQuery = executeQueue.get(i);
+      PrinterHelper.println(StringHelper.newline + "Query " + i + StringHelper.newline);
+      SQLHelper.printResultSet(executedQuery.getResultSet());
+    }
+  }
+
+  public static void executeAndPrintQuery() throws SQLException, FileNotFoundException, IOException {
     Map<String, String> props = new TreeMap<>();
     props.put("user", dbUser);
     props.put("password", dbPassword);
