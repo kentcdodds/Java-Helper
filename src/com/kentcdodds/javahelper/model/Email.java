@@ -62,7 +62,7 @@ public class Email {
   }
 
   /**
-   * Constructor: Use for e-mails with attachments
+   * Full Constructor: Use for e-mails with attachments
    *
    * @param from
    * @param to
@@ -72,12 +72,13 @@ public class Email {
    * @param bcc
    * @param body
    */
-  public Email(String from, List<String> to, List<String> cc, List<String> bcc, String subject, String body, List<MimeBodyPart> bodyParts) {
+  public Email(String from, List<String> to, List<String> cc, List<String> bcc, String subject, String body, boolean html, List<MimeBodyPart> bodyParts) {
     this.from = from;
     this.to = to;
     this.cc = cc;
     this.bcc = bcc;
     this.subject = subject;
+    this.html = html;
     this.bodyParts = bodyParts;
   }
   //</editor-fold>
