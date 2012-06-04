@@ -6,10 +6,9 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import oracle.sql.CLOB;
 
 /**
- * Helper object for the OracleHelper. Has several helpful methods of its own.
+ * Helper object for the SQLHelper. Has several helpful methods of its own.
  *
  * @author kentcdodds
  */

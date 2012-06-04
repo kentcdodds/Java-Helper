@@ -1,7 +1,7 @@
 package com.kentcdodds.javahelper.model;
 
 /**
- * Javabean for the OracleHelper. Used in HelperQuery.
+ * Javabean for the SQLHelper. Used in HelperQuery.
  *
  * @author kentcdodds
  */

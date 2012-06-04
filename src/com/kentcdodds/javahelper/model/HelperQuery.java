@@ -3,7 +3,7 @@ package com.kentcdodds.javahelper.model;
 import java.sql.ResultSet;
 
 /**
- * Javabean for the OracleHelper. Used in HelperConnection
+ * Javabean for the SQLHelper. Used in HelperConnection
  * @author kentcdodds
  */
 public class HelperQuery {

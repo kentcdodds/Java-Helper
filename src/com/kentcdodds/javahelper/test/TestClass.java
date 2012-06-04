@@ -68,8 +68,8 @@ public class TestClass {
     Map<String, String> props = new TreeMap<>();
     props.put("user", dbUser);
     props.put("password", dbPassword);
-    ResultSet rs = OracleHelper.executeQuery(devDatabaseUrl, props, "select 'h' \"question\" from dual");
-    OracleHelper.resultSetToCSVFile(rs, ioPlaygroundDir.getPath() +"test.csv");
+    ResultSet rs = SQLHelper.executeQuery(devDatabaseUrl, props, "select 'h' \"question\" from dual");
+    SQLHelper.resultSetToCSVFile(rs, ioPlaygroundDir.getPath() +"test.csv");
   }
 
   public static void progressImage() throws IOException, InterruptedException {

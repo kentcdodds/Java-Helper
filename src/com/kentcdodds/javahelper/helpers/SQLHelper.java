@@ -17,7 +17,7 @@ import java.util.Map;
  *
  * @author kentcdodds
  */
-public class OracleHelper {
+public class SQLHelper {
 
   /**
    * Creates a new HelperConnection and executes a new HelperQuery. Useful for when you don't care to keep the
