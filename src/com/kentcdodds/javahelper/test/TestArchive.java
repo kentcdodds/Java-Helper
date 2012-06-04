@@ -30,16 +30,20 @@ import org.apache.commons.lang3.math.NumberUtils;
  */
 public class TestArchive {
 
-    public static String testImageLocation = TestClass.testImageLocation;
+  public static String testImageLocation = TestClass.testImageLocation;
   public static String progressImageUrl = TestClass.progressImageUrl;
   public static File ioPlaygroundDir = TestClass.ioPlaygroundDir;
   public static String prodDatabaseUrl = TestClass.prodDatabaseUrl;
   public static String devDatabaseUrl = TestClass.devDatabaseUrl;
   public static String dbPassword = TestClass.dbPassword;
   public static String dbUser = TestClass.dbUser;
+  public static String gmailUser = TestClass.gmailUser;
+  public static String gmailPassword = TestClass.gmailPassword;
+  public static String ldsUser = TestClass.ldsUser;
+  public static String ldsPassword = TestClass.ldsPassword;
   public static Map<String, String> properties = TestClass.properties;
-  
-    public static void executQueries() throws SQLException {
+
+  public static void executQueries() throws SQLException {
     HelperConnection helperConnection = new HelperConnection(devDatabaseUrl, properties);
     helperConnection.addQueryToQueue(new HelperQuery("select * from dual"));
     helperConnection.addQueryToQueue(new HelperQuery("select * from dual"));
@@ -235,20 +239,25 @@ public class TestArchive {
   }
 
   public static void email() throws MessagingException {
-    String from = "from";
+    String from = ldsUser;
     List<String> to = new ArrayList<>();
-    to.add("dfkewofds@mailinator.com");
+    to.add("me@kentcdodds.com");
     List<String> cc = new ArrayList<>();
-    cc.add("dfkefofds@mailinator.com");
+//    cc.add("dfkefofds@mailinator.com");
     List<String> bcc = new ArrayList<>();
-    bcc.add("gfdjakl@mailinator.com");
-    String subject = "This is a test subject!";
-    Email email = new Email(from, to, cc, bcc, subject, "This is the message!");
+//    bcc.add("gfdjakl@mailinator.com");
+    String subject = "This is a test subject!3";
+    Email email = new Email(from, to, cc, bcc, subject, "<h1>This is a test</h1>"
+            + "<img src=\"http://www.rgagnon.com/images/jht.gif\">");
+    email.setHtml(true);
     EmailAttachment attachment = new EmailAttachment();
 //    attachment.setFile(new File("C:\\Users\\kentcdodds\\Documents\\test attachment.txt"));
-    attachment.setFile(new File("C:\\Users\\Kent\\test.txt"));
+    attachment.setFile(new File(ioPlaygroundDir, "I am a print test.txt"));
     email.addEmailAttachment(attachment);
-    Session session = EmailHelper.getYahooSession("yahoo_user", "yahoo_password");
+    Properties props = new Properties();
+    props.setProperty("mail.smtp.host", "smtp-relay.wh.ldsglobal.net");
+    props.setProperty("mail.smtp.port", "25");
+    Session session = Session.getInstance(props, null);
     session.setDebug(true);
     EmailHelper.sendEmail(session, email);
 //    System.out.println(ReflectionHelper.getObjectInString(email, true, 1, true, 1));
@@ -349,5 +358,4 @@ public class TestArchive {
     System.out.println("Cal2: " + cal2.getTime());
     System.out.println("DaysDifference: " + DateHelper.getDaysDifference(cal1.getTime(), cal2.getTime()));
   }
-  
 }

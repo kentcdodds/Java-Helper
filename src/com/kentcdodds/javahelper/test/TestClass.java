@@ -24,11 +24,15 @@ public class TestClass {
   public static String devDatabaseUrl;
   public static String dbPassword;
   public static String dbUser;
+  public static String gmailUser;
+  public static String gmailPassword;
+  public static String ldsUser;
+  public static String ldsPassword;
   public static Map<String, String> properties;
 
   public static void main(String[] args) throws Exception {
     setStuff();
-    IOHelper.sendReplaceInAllFilesToPrinter(IOHelper.replaceInAllFiles(new File("C:\\Users\\kentcdodds\\Dropbox\\Shared with home\\Netbeans Projects\\BONotifier\\src"), -3, "PrinterHelper.print", "PrinterHelper.println"));
+    TestArchive.email();
     System.exit(0);
   }
 
@@ -50,6 +54,12 @@ public class TestClass {
     properties = new TreeMap<>();
     properties.put("user", dbUser);
     properties.put("password", dbPassword);
+    
+    gmailUser = prop.getProperty("gmailUser");
+    gmailPassword = OtherHelper.descrambleString(prop.getProperty("gmailScrambledPassword"));
+    
+    ldsUser = prop.getProperty("ldsUser");
+    ldsPassword = OtherHelper.descrambleString(prop.getProperty("ldsScrambledPassword"));
 
   }
 

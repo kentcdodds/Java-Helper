@@ -151,14 +151,12 @@ public class EmailHelper {
     }
 
     //Set content
-    Multipart multipart = new MimeMultipart();
+    Multipart multipart = new MimeMultipart("alternative");
     message.setSubject(email.getSubject());
-    MimeBodyPart contentPart = new MimeBodyPart();
-    contentPart.setText(email.getBody());
-    multipart.addBodyPart(contentPart);
     for (MimeBodyPart mimeBodyPart : email.getBodyParts()) {
       multipart.addBodyPart(mimeBodyPart);
     }
+    multipart.addBodyPart(email.getContentBodyPart());
     message.setContent(multipart);
 
     //Send the message

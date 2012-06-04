@@ -17,6 +17,7 @@ public class Email {
   private List<String> bcc = new ArrayList<>();
   private String subject = "";
   private String body = "";
+  private boolean html = false;
   private List<MimeBodyPart> bodyParts = new ArrayList<>();
 
   //<editor-fold defaultstate="collapsed" desc="Constructors">
@@ -91,15 +92,32 @@ public class Email {
    * @throws MessagingException
    */
   public boolean addEmailAttachment(EmailAttachment attachment) throws MessagingException {
-      if (attachment.getBodyPart() == null) {
+    if (attachment.getBodyPart() == null) {
       boolean success = attachment.generateMimeBodyPart();
-        if (!success) {
+      if (!success) {
         return false;
-        }
       }
-      bodyParts.add(attachment.getBodyPart());
-    return true;
     }
+    bodyParts.add(attachment.getBodyPart());
+    return true;
+  }
+
+  /**
+   * Gets the body body part with proper encoding
+   *
+   * @return
+   * @throws MessagingException
+   */
+  public MimeBodyPart getContentBodyPart() throws MessagingException {
+    MimeBodyPart contentBodyPart = new MimeBodyPart();
+    if (html) {
+      contentBodyPart.setHeader("Content-Type", "text/html");
+      contentBodyPart.setContent(body, "text/html");
+    } else {
+      contentBodyPart.setContent(body, "text/plain");
+    }
+    return contentBodyPart;
+  }
 
   //<editor-fold defaultstate="collapsed" desc="Getters and Setters">
   /**
@@ -198,6 +216,20 @@ public class Email {
    */
   public void setBody(String body) {
     this.body = body;
+  }
+
+  /**
+   * @return the html
+   */
+  public boolean isHtml() {
+    return html;
+  }
+
+  /**
+   * @param html the html to set
+   */
+  public void setHtml(boolean html) {
+    this.html = html;
   }
   //</editor-fold>
 }
