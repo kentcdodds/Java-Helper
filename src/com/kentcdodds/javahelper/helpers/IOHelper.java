@@ -17,6 +17,7 @@ import java.util.zip.ZipOutputStream;
 public class IOHelper {
 
   public static final String homeDir = System.getProperty("user.home");
+  public static final String osName = System.getProperty("os.name");
   public static final String[] badFileNameCharacters = new String[]{"\\", "/", ":", "*", "?", "\"", "<", ">", "|"};
 
   //<editor-fold defaultstate="collapsed" desc="Filename Methods">
@@ -441,25 +442,25 @@ public class IOHelper {
     java.util.List<File> appliedFiles = replaced[0];
     java.util.List<File> unappliedFiles = replaced[1];
     java.util.List<File> errorFiles = replaced[2];
-    
+
     PrinterHelper.println("Applied files");
     PrinterHelper.println(StringHelper.newline + "\t" + StringHelper.splitBy(StringHelper.newline + "\t", errorFiles));
     PrinterHelper.println("Total Applied Files: " + appliedFiles.size());
-    
+
     PrinterHelper.println();
-    
+
     PrinterHelper.println("Unapplied files");
     PrinterHelper.println(StringHelper.newline + "\t" + StringHelper.splitBy(StringHelper.newline + "\t", unappliedFiles));
     PrinterHelper.println("Total Unapplied Files: " + unappliedFiles.size());
-    
+
     PrinterHelper.println();
 
     PrinterHelper.println("Error files");
     PrinterHelper.println(StringHelper.newline + "\t" + StringHelper.splitBy(StringHelper.newline + "\t", errorFiles));
     PrinterHelper.println("Total Error Files: " + errorFiles.size());
-    
+
     PrinterHelper.println();
-    
+
     PrinterHelper.println("Total files" + (appliedFiles.size() + unappliedFiles.size() + errorFiles.size()));
   }
   //</editor-fold>
@@ -580,6 +581,22 @@ public class IOHelper {
   //</editor-fold>
 
   //<editor-fold defaultstate="collapsed" desc="Other IO methods">
+  /**
+   * Very simple convenience method. Creates a ProcessBuilder and
+   *
+   * @param file
+   * @throws IOException
+   */
+  public static void showInExplorerOrFinder(File file) throws IOException {
+    if (osName.contains("Windows")) {
+      new ProcessBuilder("explorer.exe", "/select," + file.getPath()).start();
+    } else if (osName.contains("Mac")) {
+      Runtime.getRuntime().exec("open -R " + file.getPath()); //TODO: See if this works.
+    } else if (osName.contains("Linux")) {
+      //TODO: Handle this
+    }
+  }
+
   /**
    * Makes sure that the given file's parent directory exists. Creates it if not.
    *

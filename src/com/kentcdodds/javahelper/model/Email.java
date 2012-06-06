@@ -12,6 +12,7 @@ import javax.mail.internet.MimeBodyPart;
 public class Email {
 
   private String from = "";
+  private List<String> replyTo = new ArrayList<>();
   private List<String> to = new ArrayList<>();
   private List<String> cc = new ArrayList<>();
   private List<String> bcc = new ArrayList<>();
@@ -72,8 +73,9 @@ public class Email {
    * @param bcc
    * @param body
    */
-  public Email(String from, List<String> to, List<String> cc, List<String> bcc, String subject, String body, boolean html, List<MimeBodyPart> bodyParts) {
+  public Email(String from, List<String> replyTo, List<String> to, List<String> cc, List<String> bcc, String subject, String body, boolean html, List<MimeBodyPart> bodyParts) {
     this.from = from;
+    this.replyTo = replyTo;
     this.to = to;
     this.cc = cc;
     this.bcc = bcc;
@@ -118,6 +120,13 @@ public class Email {
       contentBodyPart.setContent(body, "text/plain");
     }
     return contentBodyPart;
+  }
+  
+  /**
+   * Adds the given address(s) to the replyTo list
+   */
+  public void addReplyTo(String... address) {
+    replyTo.addAll(java.util.Arrays.asList(address));
   }
 
   //<editor-fold defaultstate="collapsed" desc="Getters and Setters">
@@ -231,6 +240,20 @@ public class Email {
    */
   public void setHtml(boolean html) {
     this.html = html;
+  }
+
+  /**
+   * @return the replyTo
+   */
+  public List<String> getReplyTo() {
+    return replyTo;
+  }
+
+  /**
+   * @param replyTo the replyTo to set
+   */
+  public void setReplyTo(List<String> replyTo) {
+    this.replyTo = replyTo;
   }
   //</editor-fold>
 }

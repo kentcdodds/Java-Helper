@@ -246,7 +246,7 @@ public class TestArchive {
 //    cc.add("dfkefofds@mailinator.com");
     List<String> bcc = new ArrayList<>();
 //    bcc.add("gfdjakl@mailinator.com");
-    String subject = "This is a test subject!3";
+    String subject = "This is a test subject!";
     Email email = new Email(from, to, cc, bcc, subject, "<h1>This is a test</h1>"
             + "<img src=\"http://www.rgagnon.com/images/jht.gif\">");
     email.setHtml(true);
@@ -254,6 +254,7 @@ public class TestArchive {
 //    attachment.setFile(new File("C:\\Users\\kentcdodds\\Documents\\test attachment.txt"));
     attachment.setFile(new File(ioPlaygroundDir, "I am a print test.txt"));
     email.addEmailAttachment(attachment);
+    email.addReplyTo("kentdoddsproductions@gmail.com", "kentcdodds@gmail.com");
     Properties props = new Properties();
     props.setProperty("mail.smtp.host", "smtp-relay.wh.ldsglobal.net");
     props.setProperty("mail.smtp.port", "25");

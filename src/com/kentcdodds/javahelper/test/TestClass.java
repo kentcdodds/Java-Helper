@@ -33,6 +33,7 @@ public class TestClass {
   public static void main(String[] args) throws Exception {
     setStuff();
     TestArchive.email();
+//    System.out.println(System.getProperty("os.name"));
     System.exit(0);
   }
 

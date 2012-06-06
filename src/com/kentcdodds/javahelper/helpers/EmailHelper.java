@@ -5,6 +5,7 @@ import com.kentcdodds.javahelper.model.EmailAttachment;
 import com.kentcdodds.javahelper.model.HelperFile;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.List;
 import java.util.Properties;
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
@@ -136,6 +137,15 @@ public class EmailHelper {
 
     //Set participants
     message.setFrom(new InternetAddress(email.getFrom()));
+
+    List<String> replyTo = email.getReplyTo();
+    if (replyTo != null && !replyTo.isEmpty()) {
+      InternetAddress[] replyToAddresses = new InternetAddress[replyTo.size()];
+      for (int i = 0; i < replyTo.size(); i++) {
+        replyToAddresses[i] = (new InternetAddress(replyTo.get(i)));
+      }
+      message.setReplyTo(replyToAddresses);
+    }
 
     for (String address : email.getTo()) {
       message.addRecipient(Message.RecipientType.TO,
