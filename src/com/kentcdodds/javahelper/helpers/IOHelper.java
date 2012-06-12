@@ -444,7 +444,7 @@ public class IOHelper {
     java.util.List<File> errorFiles = replaced[2];
 
     PrinterHelper.println("Applied files");
-    PrinterHelper.println(StringHelper.newline + "\t" + StringHelper.splitBy(StringHelper.newline + "\t", errorFiles));
+    PrinterHelper.println(StringHelper.newline + "\t" + StringHelper.splitBy(StringHelper.newline + "\t", appliedFiles));
     PrinterHelper.println("Total Applied Files: " + appliedFiles.size());
 
     PrinterHelper.println();
