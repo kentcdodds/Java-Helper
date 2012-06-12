@@ -32,8 +32,9 @@ public class TestClass {
 
   public static void main(String[] args) throws Exception {
     setStuff();
-    TestArchive.email();
-//    System.out.println(System.getProperty("os.name"));
+//    OtherHelper.scrambleString("Brooke is great!");
+//    TestArchive.email();
+//    System.out.println(System .getProperty("os.name"));
     System.exit(0);
   }
 
@@ -55,14 +56,12 @@ public class TestClass {
     properties = new TreeMap<>();
     properties.put("user", dbUser);
     properties.put("password", dbPassword);
-    
+
     gmailUser = prop.getProperty("gmailUser");
     gmailPassword = OtherHelper.descrambleString(prop.getProperty("gmailScrambledPassword"));
-    
+
     ldsUser = prop.getProperty("ldsUser");
     ldsPassword = OtherHelper.descrambleString(prop.getProperty("ldsScrambledPassword"));
 
   }
-
-
 }
