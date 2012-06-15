@@ -104,7 +104,7 @@ public class Email {
     bodyParts.add(attachment.getBodyPart());
     return true;
   }
-
+  
   /**
    * Gets the body body part with proper encoding
    *

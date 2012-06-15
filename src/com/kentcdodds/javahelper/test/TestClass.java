@@ -28,10 +28,12 @@ public class TestClass {
   public static String gmailPassword;
   public static String ldsUser;
   public static String ldsPassword;
-  public static Map<String, String> properties;
+  public static Properties mailServerProperties;
+  public static Properties sqlProperties;
 
   public static void main(String[] args) throws Exception {
     setStuff();
+    TestArchive.email();
 //    OtherHelper.scrambleString("Brooke is great!");
 //    TestArchive.email();
 //    System.out.println(System .getProperty("os.name"));
@@ -39,7 +41,7 @@ public class TestClass {
   }
 
   /**
-   * The stuff I want to set at the beginning of all my tests. Loads a properties file which holds the values to
+   * The stuff I want to set at the beginning of all my tests. Loads a sqlProperties file which holds the values to
    * personal variables (passwords, etc.)
    */
   public static void setStuff() throws IOException {
@@ -53,9 +55,13 @@ public class TestClass {
     prodDatabaseUrl = prop.getProperty("prodDatabase");
     dbPassword = OtherHelper.descrambleString(prop.getProperty("dbScrambledPassword"));
     dbUser = prop.getProperty("dbUser");
-    properties = new TreeMap<>();
-    properties.put("user", dbUser);
-    properties.put("password", dbPassword);
+    sqlProperties = new Properties();
+    sqlProperties.put("user", dbUser);
+    sqlProperties.put("password", dbPassword);
+    
+    mailServerProperties = new Properties();
+    mailServerProperties.setProperty("mail.smtp.host", prop.getProperty("mail.smtp.host"));
+    mailServerProperties.setProperty("mail.smtp.port", prop.getProperty("mail.smtp.port"));
 
     gmailUser = prop.getProperty("gmailUser");
     gmailPassword = OtherHelper.descrambleString(prop.getProperty("gmailScrambledPassword"));

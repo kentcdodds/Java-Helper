@@ -9,6 +9,7 @@ import javax.activation.DataSource;
 import javax.activation.FileDataSource;
 import javax.mail.Message;
 import javax.mail.MessagingException;
+import javax.mail.internet.InternetHeaders;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.util.ByteArrayDataSource;
 
@@ -64,6 +65,9 @@ public class EmailAttachment {
    */
   public boolean generateMimeBodyPart() throws MessagingException {
     DataSource source;
+    if (bodyPart != null) {
+      return true;
+    }
     if (fileBytes != null) {
       source = new ByteArrayDataSource(fileBytes, Message.ATTACHMENT) {
 
@@ -87,6 +91,18 @@ public class EmailAttachment {
     bodyPart.setDataHandler(new DataHandler(source));
     bodyPart.setFileName(getAttachmentName());
     return true;
+  }
+
+  /**
+   * Sets the attachment as an inline image.
+   *
+   * @param contentId
+   * @throws MessagingException
+   */
+  public void setBodyPartAsInlineImage(String contentId) throws MessagingException {
+    bodyPart.setHeader("Content-Type", "image/jpeg");
+    bodyPart.setDisposition(MimeBodyPart.INLINE);
+    bodyPart.setContentID("<" + contentId + ">");
   }
 
   /**

@@ -161,12 +161,12 @@ public class EmailHelper {
     }
 
     //Set content
-    Multipart multipart = new MimeMultipart("alternative");
+    Multipart multipart = new MimeMultipart();
     message.setSubject(email.getSubject());
+    multipart.addBodyPart(email.getContentBodyPart());
     for (MimeBodyPart mimeBodyPart : email.getBodyParts()) {
       multipart.addBodyPart(mimeBodyPart);
     }
-    multipart.addBodyPart(email.getContentBodyPart());
     message.setContent(multipart);
 
     //Send the message

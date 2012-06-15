@@ -17,7 +17,7 @@ import java.util.logging.Logger;
 public class HelperConnection {
 
   private String jdbcURL = null;
-  private Map<String, String> properties = null;
+  private Properties connectionProperties = null;
   private Connection connection = null;
   private java.util.List<HelperQuery> queuedQueries = new java.util.ArrayList<>();
   private java.util.List<HelperQuery> errorQueries = new java.util.ArrayList<>();
@@ -37,7 +37,20 @@ public class HelperConnection {
    */
   public HelperConnection(String jdbcURL, Map<String, String> properties) {
     this.jdbcURL = jdbcURL;
-    this.properties = properties;
+    for (Map.Entry<String, String> entry : properties.entrySet()) {
+      this.connectionProperties.put(entry.getKey(), entry.getValue());
+    }
+  }
+
+  /**
+   * Full constructor
+   *
+   * @param jdbcURL
+   * @param properties
+   */
+  public HelperConnection(String jdbcURL, Properties properties) {
+    this.jdbcURL = jdbcURL;
+    this.connectionProperties = properties;
   }
 
   /**
@@ -51,11 +64,7 @@ public class HelperConnection {
   public Connection getOrCreateConnection() throws SQLException {
     if (connection == null
             || connection.isClosed()) {
-      Properties connectionProps = new Properties();
-      for (Map.Entry<String, String> entry : properties.entrySet()) {
-        connectionProps.put(entry.getKey(), entry.getValue());
-      }
-      connection = DriverManager.getConnection(jdbcURL, connectionProps);
+      connection = DriverManager.getConnection(jdbcURL, getConnectionProperties());
       connection.setAutoCommit(false);
     }
     return connection;
@@ -338,20 +347,6 @@ public class HelperConnection {
   }
 
   /**
-   * @return the properties
-   */
-  public Map<String, String> getProperties() {
-    return properties;
-  }
-
-  /**
-   * @param properties the properties to set
-   */
-  public void setProperties(Map<String, String> properties) {
-    this.properties = properties;
-  }
-
-  /**
    * @return the connection
    */
   public Connection getConnection() {
@@ -405,5 +400,19 @@ public class HelperConnection {
    */
   public void setErrorQueries(java.util.List<HelperQuery> errorQueries) {
     this.errorQueries = errorQueries;
+  }
+
+  /**
+   * @return the connectionProperties
+   */
+  public Properties getConnectionProperties() {
+    return connectionProperties;
+  }
+
+  /**
+   * @param connectionProperties the connectionProperties to set
+   */
+  public void setConnectionProperties(Properties connectionProperties) {
+    this.connectionProperties = connectionProperties;
   }
 }

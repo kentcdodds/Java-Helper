@@ -41,10 +41,11 @@ public class TestArchive {
   public static String gmailPassword = TestClass.gmailPassword;
   public static String ldsUser = TestClass.ldsUser;
   public static String ldsPassword = TestClass.ldsPassword;
-  public static Map<String, String> properties = TestClass.properties;
+  public static Properties sqlProperties = TestClass.sqlProperties;
+  public static Properties mailServerProperties = TestClass.mailServerProperties;
 
   public static void executQueries() throws SQLException {
-    HelperConnection helperConnection = new HelperConnection(devDatabaseUrl, properties);
+    HelperConnection helperConnection = new HelperConnection(devDatabaseUrl, sqlProperties);
     helperConnection.addQueryToQueue(new HelperQuery("select * from dual"));
     helperConnection.addQueryToQueue(new HelperQuery("select * from dual"));
     helperConnection.addQueryToQueue(new HelperQuery("select * from dual"));
@@ -239,26 +240,30 @@ public class TestArchive {
   }
 
   public static void email() throws MessagingException {
-    String from = ldsUser;
+    String user = gmailUser;
+    String password = gmailPassword;
+    String from = user;
+    String contentId = "ii_137ecd92681fe047";
     List<String> to = new ArrayList<>();
     to.add("me@kentcdodds.com");
     List<String> cc = new ArrayList<>();
 //    cc.add("dfkefofds@mailinator.com");
     List<String> bcc = new ArrayList<>();
 //    bcc.add("gfdjakl@mailinator.com");
-    String subject = "This is a test subject!";
-    Email email = new Email(from, to, cc, bcc, subject, "<h1>This is a test</h1>"
-            + "<img src=\"http://www.rgagnon.com/images/jht.gif\">");
+    String subject = "This is a test subject!" + new Random().nextInt(1000);
+    String body = "<div>This is text before</div><img src=\"cid:" + contentId + "\" alt=\"Inline image 1\"><div><br></div><div>This is after</div>";
+    Email email = new Email(from, to, cc, bcc, subject, body);
     email.setHtml(true);
     EmailAttachment attachment = new EmailAttachment();
 //    attachment.setFile(new File("C:\\Users\\kentcdodds\\Documents\\test attachment.txt"));
-    attachment.setFile(new File(ioPlaygroundDir, "I am a print test.txt"));
+    attachment.setFile(new File("C:\\Users\\kentcdodds\\Downloads\\smileyfacerd1.jpg"));
+//    attachment.setFile(new File(ioPlaygroundDir, "I am a print test.txt"));
+    attachment.generateMimeBodyPart();
+    attachment.setBodyPartAsInlineImage(contentId);
     email.addEmailAttachment(attachment);
     email.addReplyTo("kentdoddsproductions@gmail.com", "kentcdodds@gmail.com");
-    Properties props = new Properties();
-    props.setProperty("mail.smtp.host", "smtp-relay.wh.ldsglobal.net");
-    props.setProperty("mail.smtp.port", "25");
-    Session session = Session.getInstance(props, null);
+//    Session session = Session.getInstance(mailServerProperties, null);
+    Session session = EmailHelper.getGoogleSession(user, password);
     session.setDebug(true);
     EmailHelper.sendEmail(session, email);
 //    System.out.println(ReflectionHelper.getObjectInString(email, true, 1, true, 1));
