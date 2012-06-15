@@ -99,8 +99,8 @@ public class EmailAttachment {
    * @param contentId
    * @throws MessagingException
    */
-  public void setBodyPartAsInlineImage(String contentId) throws MessagingException {
-    bodyPart.setHeader("Content-Type", "image/jpeg");
+  public void setBodyPartAsInlineResource(String contentType, String contentId) throws MessagingException {
+    bodyPart.setHeader("Content-Type", contentType);
     bodyPart.setDisposition(MimeBodyPart.INLINE);
     bodyPart.setContentID("<" + contentId + ">");
   }

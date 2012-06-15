@@ -243,7 +243,7 @@ public class TestArchive {
     String user = gmailUser;
     String password = gmailPassword;
     String from = user;
-    String contentId = "ii_137ecd92681fe047";
+    String contentId = "image2";
     List<String> to = new ArrayList<>();
     to.add("me@kentcdodds.com");
     List<String> cc = new ArrayList<>();
@@ -256,10 +256,11 @@ public class TestArchive {
     email.setHtml(true);
     EmailAttachment attachment = new EmailAttachment();
 //    attachment.setFile(new File("C:\\Users\\kentcdodds\\Documents\\test attachment.txt"));
-    attachment.setFile(new File("C:\\Users\\kentcdodds\\Downloads\\smileyfacerd1.jpg"));
+//    attachment.setFile(new File("C:\\Users\\kentcdodds\\Downloads\\smileyfacerd1.jpg"));
+    attachment.setFile(new File("C:\\Users\\kentcdodds\\Downloads\\CrystalReportViewer.pdf"));
 //    attachment.setFile(new File(ioPlaygroundDir, "I am a print test.txt"));
     attachment.generateMimeBodyPart();
-    attachment.setBodyPartAsInlineImage(contentId);
+    attachment.setBodyPartAsInlineResource("application/pdf", contentId);
     email.addEmailAttachment(attachment);
     email.addReplyTo("kentdoddsproductions@gmail.com", "kentcdodds@gmail.com");
 //    Session session = Session.getInstance(mailServerProperties, null);
