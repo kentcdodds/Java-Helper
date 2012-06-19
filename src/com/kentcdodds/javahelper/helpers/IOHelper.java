@@ -4,6 +4,8 @@ import com.kentcdodds.javahelper.model.HelperFile;
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
@@ -96,7 +98,7 @@ public class IOHelper {
   }
 
   /**
-   * Returns all the lines in the scanner's stream as a String
+   * Returns all the lines in the Reader's stream as a String
    *
    * @param reader
    * @return
@@ -141,6 +143,43 @@ public class IOHelper {
   public static void copyFile(File sourceFile, File outputFile) throws FileNotFoundException, IOException {
     InputStream inputStream = new FileInputStream(sourceFile);
     saveInputStream(inputStream, outputFile);
+  }
+
+  /**
+   * Downloads the given url location to the given output file destination.
+   *
+   * @param urlString the source of the file
+   * @param outputFile the destination of the file
+   * @throws MalformedURLException
+   * @throws FileNotFoundException
+   * @throws IOException
+   */
+  public static void downloadFile(String urlString, File outputFile) throws MalformedURLException, FileNotFoundException, IOException {
+    URL url = new URL(urlString);
+    ReadableByteChannel rbc = Channels.newChannel(url.openStream());
+    try (FileOutputStream fos = new FileOutputStream(outputFile)) {
+      fos.getChannel().transferFrom(rbc, 0, 1 << 24);
+    }
+  }
+
+  /**
+   * Downloads the file represented by the given urlString into the returned byte array.
+   *
+   * @param urlString the source of the file
+   * @return the bytes of the downloaded file
+   * @throws MalformedURLException
+   * @throws IOException
+   */
+  public static byte[] downloadFile(String urlString) throws MalformedURLException, IOException {
+    URL url = new URL(urlString);
+    InputStream inputStream = url.openStream();
+    try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+      int next;
+      while ((next = inputStream.read()) > 0) {
+        out.write(next);
+      }
+      return out.toByteArray();
+    }
   }
 
   /**
