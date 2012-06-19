@@ -82,20 +82,34 @@ public class IOHelper {
   }
 
   /**
+   * Opens a stream to the given URL and reads everything into the returned String. Uses UTF-8 encoding
+   *
+   * @param urlString
+   * @return
+   * @throws MalformedURLException
+   * @throws IOException
+   */
+  public static String webpageToString(String urlString) throws MalformedURLException, IOException {
+    URL url = new URL(urlString);
+    InputStream is = url.openStream();
+    return readerToString(new InputStreamReader(is, "UTF-8"));
+  }
+
+  /**
    * Returns all the lines in the scanner's stream as a String
    *
-   * @param streamReader
+   * @param reader
    * @return
    * @throws IOException when trying to read from the file
    */
-  public static String readerToString(InputStreamReader streamReader) throws IOException {
+  public static String readerToString(Reader reader) throws IOException {
     StringWriter stringWriter = new StringWriter();
     char[] buffer = new char[1024];
     int length;
-    while ((length = streamReader.read(buffer)) > 0) {
+    while ((length = reader.read(buffer)) > 0) {
       stringWriter.write(buffer, 0, length);
     }
-    streamReader.close();
+    reader.close();
     stringWriter.close();
     return stringWriter.toString();
   }
