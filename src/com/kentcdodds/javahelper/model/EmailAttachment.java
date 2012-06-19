@@ -1,15 +1,16 @@
 package com.kentcdodds.javahelper.model;
 
 import com.kentcdodds.javahelper.helpers.IOHelper;
+import com.kentcdodds.javahelper.helpers.StringHelper;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.URL;
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
 import javax.activation.FileDataSource;
 import javax.mail.Message;
 import javax.mail.MessagingException;
-import javax.mail.internet.InternetHeaders;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.util.ByteArrayDataSource;
 
@@ -20,6 +21,7 @@ import javax.mail.util.ByteArrayDataSource;
 public class EmailAttachment {
 
   private File file;
+  private URL url;
   private byte[] fileBytes;
   private String fileName;
   private String attachmentName;
@@ -54,6 +56,15 @@ public class EmailAttachment {
   }
 
   /**
+   * Constructor: This is the minimum you need to send the attachment. The url must be valid
+   *
+   * @param file
+   */
+  public EmailAttachment(URL url) {
+    this.url = url;
+  }
+
+  /**
    * Generates and sets the MimeBodyPart for this attachment. First checks whether the attachment has bytes already.
    * This allows you to give an email attachment which has bytes in memory and doesn't have an actual file. If the bytes
    * are null it reads the bytes from the file. If the file is null returns false. **Important** Be sure the at least
@@ -63,21 +74,24 @@ public class EmailAttachment {
    * @return whether the MimeBodyPart was successfully generated
    * @throws MessagingException when setting DataHandler and the filename
    */
-  public boolean generateMimeBodyPart() throws MessagingException {
+  public boolean generateMimeBodyPart() throws MessagingException, FileNotFoundException, IOException, Exception {
     DataSource source;
     if (bodyPart != null) {
       return true;
     }
-    if (fileBytes != null) {
-      source = new ByteArrayDataSource(fileBytes, Message.ATTACHMENT) {
+    if (file != null) {
+      source = new FileDataSource(file) {
 
         @Override
         public String getContentType() {
           return "application/octet-stream";
         }
       };
-    } else if (file != null) {
-      source = new FileDataSource(file) {
+    } else if (fileBytes != null || url != null) {
+      if (url != null) {
+        generateFileBytes(); //download the file into the fileBytes array.
+      }
+      source = new ByteArrayDataSource(fileBytes, Message.ATTACHMENT) {
 
         @Override
         public String getContentType() {
@@ -192,11 +206,28 @@ public class EmailAttachment {
    * @throws IOException when reading the file
    * @throws when reading fileBytes
    */
-  public byte[] generateFileBytes() throws FileNotFoundException, IOException, Exception {
-    this.fileBytes = IOHelper.getFileBytes(file);
-    return getFileBytes();
+  public void generateFileBytes() throws FileNotFoundException, IOException, Exception {
+    if (file != null) {
+      this.fileBytes = IOHelper.getFileBytes(file);
+    } else if (url != null) {
+      this.fileBytes = IOHelper.downloadFile(url);
+    }
   }
 
+  
+  @Override
+  public String toString() {
+    return StringHelper.splitBy(StringHelper.newline
+            , "Attachment Name: " + ((attachmentName != null) ? attachmentName : "null")
+            , "File: " + ((file != null) ? file.getPath() : "null")
+            , "File Name: " + ((fileName != null) ? fileName : "null")
+            , "Extension: " + ((extension != null) ? extension : "null")
+            , "Full File Name: " + ((fullFileName != null) ? fullFileName : "null")
+            , "URL: " + ((url != null) ? url : "null")
+            , "File Bytes size: " + ((fileBytes != null) ? fileBytes.length : "null")
+            , "Mime Body Part: " + ((bodyPart != null) ? "exists" : "null")
+            );
+  }
   /**
    * @return the file
    */
@@ -254,5 +285,19 @@ public class EmailAttachment {
    */
   public void setAttachmentName(String attachmentName) {
     this.attachmentName = attachmentName;
+  }
+
+  /**
+   * @return the url
+   */
+  public URL getUrl() {
+    return url;
+  }
+
+  /**
+   * @param url the url to set
+   */
+  public void setUrl(URL url) {
+    this.url = url;
   }
 }

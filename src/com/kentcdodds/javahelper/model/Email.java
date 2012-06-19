@@ -1,7 +1,11 @@
 package com.kentcdodds.javahelper.model;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeBodyPart;
 
@@ -86,6 +90,29 @@ public class Email {
   //</editor-fold>
 
   /**
+   * Convenience method. Allows adding of many attachments on one method call. Does not allow you to handle your own
+   * exceptions.
+   *
+   * @param attachment
+   * @return all the attachments which failed either because the mimeBodyPart generation failed or there was another
+   * exception.
+   */
+  public List<EmailAttachment> addEmailAttachments(EmailAttachment... attachment) {
+    List<EmailAttachment> failedAttachments = new ArrayList<>();
+    for (EmailAttachment emailAttachment : attachment) {
+      try {
+        boolean success = addEmailAttachment(emailAttachment);
+        if (!success) {
+          failedAttachments.add(emailAttachment);
+        }
+      } catch (Exception ex) {
+        failedAttachments.add(emailAttachment);
+      }
+    }
+    return failedAttachments;
+  }
+
+  /**
    * Adds the given attachment as a body part. First checks whether the attachment has bytes already. This allows you to
    * give an email attachment which has bytes in memory and doesn't have an actual file. If the bytes are null it reads
    * the bytes from the file. If the file is null no attachment is added.
@@ -94,7 +121,7 @@ public class Email {
    * @return whether the attachment was successfully added to the bodyParts list
    * @throws MessagingException
    */
-  public boolean addEmailAttachment(EmailAttachment attachment) throws MessagingException {
+  public boolean addEmailAttachment(EmailAttachment attachment) throws MessagingException, FileNotFoundException, IOException, Exception {
     if (attachment.getBodyPart() == null) {
       boolean success = attachment.generateMimeBodyPart();
       if (!success) {
@@ -104,7 +131,7 @@ public class Email {
     bodyParts.add(attachment.getBodyPart());
     return true;
   }
-  
+
   /**
    * Gets the body body part with proper encoding
    *
@@ -121,7 +148,7 @@ public class Email {
     }
     return contentBodyPart;
   }
-  
+
   /**
    * Adds the given address(s) to the replyTo list
    */

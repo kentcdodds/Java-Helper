@@ -172,13 +172,26 @@ public class IOHelper {
    */
   public static byte[] downloadFile(String urlString) throws MalformedURLException, IOException {
     URL url = new URL(urlString);
+    return downloadFile(url);
+  }
+
+  /**
+   * Downloads the file represented by the given urlString into the returned byte array.
+   *
+   * @param urlString the source of the file
+   * @return the bytes of the downloaded file
+   * @throws MalformedURLException
+   * @throws IOException
+   */
+  public static byte[] downloadFile(URL url) throws MalformedURLException, IOException {
     InputStream inputStream = url.openStream();
-    try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-      int next;
-      while ((next = inputStream.read()) > 0) {
-        out.write(next);
+    try (ByteArrayOutputStream outStream = new ByteArrayOutputStream()) {
+      int byteRead;
+      byte[] buf = new byte[1024];
+      while ((byteRead = inputStream.read(buf)) != -1) {
+        outStream.write(buf, 0, byteRead);
       }
-      return out.toByteArray();
+      return outStream.toByteArray();
     }
   }
 

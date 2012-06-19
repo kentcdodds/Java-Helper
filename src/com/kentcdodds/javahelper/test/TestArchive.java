@@ -239,7 +239,7 @@ public class TestArchive {
     System.out.println("Time difference (diff1 - diff2): " + (diff1 - diff2));
   }
 
-  public static void email() throws MessagingException {
+  public static void email() throws Exception {
     String user = gmailUser;
     String password = gmailPassword;
     String from = user;
