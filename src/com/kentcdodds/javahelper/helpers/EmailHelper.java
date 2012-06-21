@@ -216,6 +216,6 @@ public class EmailHelper {
       files[i] = new HelperFile(fileBytes, emailAttachment.getAttachmentName());
     }
     byte[] zippedBytes = IOHelper.zipFiles(files);
-    return new EmailAttachment(zippedBytes, "attachments.zip");
+    return new EmailAttachment(zippedBytes, "attachments.zip", "application/zip", Message.ATTACHMENT);
   }
 }

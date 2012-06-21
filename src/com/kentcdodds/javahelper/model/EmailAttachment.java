@@ -9,6 +9,7 @@ import java.net.URL;
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
 import javax.activation.FileDataSource;
+import javax.activation.URLDataSource;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeBodyPart;
@@ -28,11 +29,18 @@ public class EmailAttachment {
   private String extension;
   private String fullFileName;
   private MimeBodyPart bodyPart;
+  /**
+   * Used when generating the body part
+   */
+  private String contentId, contentType, disposition;
 
   /**
-   * Don't forget to set filetype, filename, and file
+   * Don't forget to set filetype, filename, contentType (defaults to "application/octet-stream"), disposition (defaults
+   * to Message.ATTACHMENT", and file/url/filebytes.
    */
   public EmailAttachment() {
+    contentType = "application/octet-stream";
+    disposition = Message.ATTACHMENT;
   }
 
   /**
@@ -41,9 +49,11 @@ public class EmailAttachment {
    * @param fileBytes
    * @param fullFileName example: "document.txt"
    */
-  public EmailAttachment(byte[] fileBytes, String fullFileName) {
+  public EmailAttachment(byte[] fileBytes, String fullFileName, String contentType, String disposition) {
     this.fileBytes = fileBytes;
     this.fullFileName = fullFileName;
+    this.contentType = contentType;
+    this.disposition = disposition;
   }
 
   /**
@@ -51,8 +61,10 @@ public class EmailAttachment {
    *
    * @param file
    */
-  public EmailAttachment(File file) {
+  public EmailAttachment(File file, String contentType, String disposition) {
     this.file = file;
+    this.contentType = contentType;
+    this.disposition = disposition;
   }
 
   /**
@@ -60,8 +72,10 @@ public class EmailAttachment {
    *
    * @param file
    */
-  public EmailAttachment(URL url) {
+  public EmailAttachment(URL url, String contentType, String disposition) {
     this.url = url;
+    this.contentType = contentType;
+    this.disposition = disposition;
   }
 
   /**
@@ -79,44 +93,84 @@ public class EmailAttachment {
     if (bodyPart != null) {
       return true;
     }
+    bodyPart = new MimeBodyPart();
     if (file != null) {
-      source = new FileDataSource(file) {
-
-        @Override
-        public String getContentType() {
-          return "application/octet-stream";
-        }
-      };
-    } else if (fileBytes != null || url != null) {
-      if (url != null) {
-        generateFileBytes(); //download the file into the fileBytes array.
-      }
-      source = new ByteArrayDataSource(fileBytes, Message.ATTACHMENT) {
-
-        @Override
-        public String getContentType() {
-          return "application/octet-stream";
-        }
-      };
+      source = getFileBodyPart();
+      bodyPart.setDisposition(disposition);
+    } else if (fileBytes != null) {
+      source = getByteArrayBodyPart();
+    } else if (url != null) {
+      source = getURLBodyPart();
+      bodyPart.setDisposition(disposition);
     } else {
+      bodyPart = null; //Because it was set to a new one before but it doesn't have a datahandler.
       return false;
     }
-    bodyPart = new MimeBodyPart();
     bodyPart.setDataHandler(new DataHandler(source));
     bodyPart.setFileName(getAttachmentName());
+    if (contentId != null) {
+      bodyPart.setContentID(contentId);
+    }
     return true;
   }
 
   /**
-   * Sets the attachment as an inline image.
+   * Returns a new FileDataSource with the file
    *
+   * @return
+   */
+  private DataSource getFileBodyPart() {
+    return new FileDataSource(file) {
+
+      @Override
+      public String getContentType() {
+        return contentType;
+      }
+    };
+
+  }
+
+  /**
+   * Returns a new ByteArrayDataSource with the filebytes and disposition
+   *
+   * @return
+   */
+  private DataSource getByteArrayBodyPart() {
+    return new ByteArrayDataSource(fileBytes, disposition) {
+
+      @Override
+      public String getContentType() {
+        return contentType;
+      }
+    };
+  }
+
+  /**
+   * Returns a new URLDataSource with the url.
+   *
+   * @return
+   */
+  private DataSource getURLBodyPart() {
+    return new URLDataSource(url) {
+
+      @Override
+      public String getContentType() {
+        return contentType;
+      }
+    };
+  }
+
+  /**
+   * Sets the attachment as an inline attachment.
+   *
+   * @param contentType the type of content ("image/jpeg" for example).
    * @param contentId
    * @throws MessagingException
    */
-  public void setBodyPartAsInlineResource(String contentType, String contentId) throws MessagingException {
-    bodyPart.setHeader("Content-Type", contentType);
-    bodyPart.setDisposition(MimeBodyPart.INLINE);
-    bodyPart.setContentID("<" + contentId + ">");
+  public void setBodyPartAsInlineAttachment(String contentType, String contentId) throws MessagingException {
+    setContentType(contentType);
+    setDisposition(MimeBodyPart.INLINE);
+    setContentId("<" + contentId + ">");
   }
 
   /**
@@ -171,6 +225,8 @@ public class EmailAttachment {
     if (fullFileName == null) {
       if (file != null) {
         fullFileName = file.getName();
+      } else if (url != null) {
+        fullFileName = url.getFile().substring(1);
       } else {
         fullFileName = getFileName() + "." + getExtension();
       }
@@ -214,20 +270,19 @@ public class EmailAttachment {
     }
   }
 
-  
   @Override
   public String toString() {
-    return StringHelper.splitBy(StringHelper.newline
-            , "Attachment Name: " + ((attachmentName != null) ? attachmentName : "null")
-            , "File: " + ((file != null) ? file.getPath() : "null")
-            , "File Name: " + ((fileName != null) ? fileName : "null")
-            , "Extension: " + ((extension != null) ? extension : "null")
-            , "Full File Name: " + ((fullFileName != null) ? fullFileName : "null")
-            , "URL: " + ((url != null) ? url : "null")
-            , "File Bytes size: " + ((fileBytes != null) ? fileBytes.length : "null")
-            , "Mime Body Part: " + ((bodyPart != null) ? "exists" : "null")
-            );
+    return StringHelper.splitBy(
+            StringHelper.newline, "Attachment Name: " + ((attachmentName != null) ? attachmentName : "null"),
+            "File: " + ((file != null) ? file.getPath() : "null"),
+            "File Name: " + ((fileName != null) ? fileName : "null"),
+            "Extension: " + ((extension != null) ? extension : "null"),
+            "Full File Name: " + ((fullFileName != null) ? fullFileName : "null"),
+            "URL: " + ((url != null) ? url : "null"),
+            "File Bytes size: " + ((fileBytes != null) ? fileBytes.length : "null"),
+            "Mime Body Part: " + ((bodyPart != null) ? "exists" : "null"));
   }
+
   /**
    * @return the file
    */
@@ -299,5 +354,27 @@ public class EmailAttachment {
    */
   public void setUrl(URL url) {
     this.url = url;
+  }
+
+  /**
+   * @param contentId the contentId to set. Note: If this is to be a disposition of MimeBodyPart.INLINE, surround the
+   * contentId with "<" + contentId + ">". This is something special with inline attachments.
+   */
+  public void setContentId(String contentId) {
+    this.contentId = contentId;
+  }
+
+  /**
+   * @param contentType the contentType to set
+   */
+  public void setContentType(String contentType) {
+    this.contentType = contentType;
+  }
+
+  /**
+   * @param disposition the disposition to set
+   */
+  public void setDisposition(String disposition) {
+    this.disposition = disposition;
   }
 }

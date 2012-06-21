@@ -16,7 +16,9 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.imageio.ImageIO;
+import javax.mail.Message;
 import javax.mail.MessagingException;
+import javax.mail.Part;
 import javax.mail.Session;
 import javax.swing.ImageIcon;
 import javax.swing.JDialog;
@@ -240,8 +242,9 @@ public class TestArchive {
   }
 
   public static void email() throws Exception {
-    String user = gmailUser;
-    String password = gmailPassword;
+//    String user = gmailUser;
+    String user = ldsUser;
+//    String password = gmailPassword;
     String from = user;
     String contentId = "image2";
     List<String> to = new ArrayList<>();
@@ -251,20 +254,29 @@ public class TestArchive {
     List<String> bcc = new ArrayList<>();
 //    bcc.add("gfdjakl@mailinator.com");
     String subject = "This is a test subject!" + new Random().nextInt(1000);
-    String body = "<div>This is text before</div><img src=\"cid:" + contentId + "\" alt=\"Inline image 1\"><div><br></div><div>This is after</div>";
+    String body = "<div>This is text before</div><img src=\"cid:" + contentId + "\" alt=\"Inline image 1\" width=\"150\"><div><br></div><div>This is after</div>";
     Email email = new Email(from, to, cc, bcc, subject, body);
     email.setHtml(true);
-    EmailAttachment attachment = new EmailAttachment();
-//    attachment.setFile(new File("C:\\Users\\kentcdodds\\Documents\\test attachment.txt"));
-//    attachment.setFile(new File("C:\\Users\\kentcdodds\\Downloads\\smileyfacerd1.jpg"));
-    attachment.setFile(new File("C:\\Users\\kentcdodds\\Downloads\\CrystalReportViewer.pdf"));
-//    attachment.setFile(new File(ioPlaygroundDir, "I am a print test.txt"));
-    attachment.generateMimeBodyPart();
-    attachment.setBodyPartAsInlineResource("application/pdf", contentId);
-    email.addEmailAttachment(attachment);
+    EmailAttachment attachment1 = new EmailAttachment();
+//    attachment1.setFile(new File("C:\\Users\\kentcdodds\\Documents\\test attachment.txt"));
+//    attachment1.setFile(new File("C:\\Users\\kentcdodds\\Downloads\\smileyfacerd1.jpg"));
+    attachment1.setFile(new File("C:\\Users\\kentcdodds\\Downloads\\CrystalReportViewer.pdf"));
+//    attachment1.setFile(new File(ioPlaygroundDir, "I am a print test.txt"));
+    attachment1.setContentType("application/pdf");
+    attachment1.generateMimeBodyPart();
+    
+    EmailAttachment attachment2 = new EmailAttachment(new URL("http://www.kentcdodds.com/photo.jpg"), "image/jpeg", Message.INLINE);
+    attachment2.setContentId("<" + contentId + ">");
+    attachment2.generateMimeBodyPart();
+    
+    EmailAttachment attachment3 = new EmailAttachment("This is a test".getBytes(), "Test.txt", "text/plain", Message.ATTACHMENT);
+    attachment3.generateMimeBodyPart();
+    
+    email.addEmailAttachments(attachment1, attachment2, attachment3);
+    
     email.addReplyTo("kentdoddsproductions@gmail.com", "kentcdodds@gmail.com");
-//    Session session = Session.getInstance(mailServerProperties, null);
-    Session session = EmailHelper.getGoogleSession(user, password);
+    Session session = Session.getInstance(mailServerProperties, null);
+//    Session session = EmailHelper.getGoogleSession(user, password);
     session.setDebug(true);
     EmailHelper.sendEmail(session, email);
 //    System.out.println(ReflectionHelper.getObjectInString(email, true, 1, true, 1));
