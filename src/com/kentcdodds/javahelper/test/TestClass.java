@@ -33,7 +33,9 @@ public class TestClass {
 
   public static void main(String[] args) throws Exception {
     setStuff();
-    TestArchive.email();
+    String fileToString = IOHelper.fileToString(ioPlaygroundDir.getPath() + "\\zipMeTest1.txt");
+    System.out.println(fileToString);
+//    TestArchive.email();
 //    OtherHelper.scrambleString("Brooke is great!");
 //    TestArchive.email();
 //    System.out.println(System .getProperty("os.name"));

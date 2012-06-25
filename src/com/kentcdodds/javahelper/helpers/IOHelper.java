@@ -65,8 +65,8 @@ public class IOHelper {
    * @throws IOException when trying to read from the file
    */
   public static String fileToString(String fileLocation) throws IOException {
-    InputStreamReader streamReader = new InputStreamReader(new FileInputStream(fileLocation), "UTF-8");
-    return readerToString(streamReader);
+    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream(fileLocation), "UTF-8"));
+    return readerToString(bufferedReader);
   }
 
   /**
@@ -79,8 +79,8 @@ public class IOHelper {
    */
   public static String resourceToString(Class klass, String resourceLocation) throws IOException {
     InputStream inputStream = klass.getResourceAsStream(resourceLocation);
-    InputStreamReader streamReader = new InputStreamReader(inputStream, "UTF-8");
-    return readerToString(streamReader);
+    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
+    return readerToString(bufferedReader);
   }
 
   /**
@@ -92,9 +92,7 @@ public class IOHelper {
    * @throws IOException
    */
   public static String webpageToString(String urlString) throws MalformedURLException, IOException {
-    URL url = new URL(urlString);
-    InputStream is = url.openStream();
-    return readerToString(new InputStreamReader(is, "UTF-8"));
+    return readerToString(getBufferedReader(urlString));
   }
 
   /**
@@ -104,16 +102,14 @@ public class IOHelper {
    * @return
    * @throws IOException when trying to read from the file
    */
-  public static String readerToString(Reader reader) throws IOException {
-    StringWriter stringWriter = new StringWriter();
-    char[] buffer = new char[1024];
-    int length;
-    while ((length = reader.read(buffer)) > 0) {
-      stringWriter.write(buffer, 0, length);
+  public static String readerToString(BufferedReader reader) throws IOException {
+    StringBuilder stringBuilder = new StringBuilder();
+    String readLine;
+    while ((readLine = reader.readLine()) != null) {
+      stringBuilder.append(readLine).append(StringHelper.newline);
     }
     reader.close();
-    stringWriter.close();
-    return stringWriter.toString();
+    return stringBuilder.toString();
   }
   //</editor-fold>
 
