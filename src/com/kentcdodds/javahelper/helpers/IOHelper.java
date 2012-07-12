@@ -496,34 +496,54 @@ public class IOHelper {
   }
 
   /**
-   * Prints the given list array of files. It's pretty much only useful for the return on the replaceInAllFiles method
+   * This is helpful just for seeing a report of a call to replaceInAllFiles().
    *
-   * @param replaced
+   * @param replaced an array of lists of files from replaceInAllFiles()
+   * @return String representation of the replaced lists
+   * @see replaceInAllFiles()
+   * @see sendReplaceInAllFilesToPrinter()
    */
-  public static void sendReplaceInAllFilesToPrinter(java.util.List<File>[] replaced) {
+  public static String getReplaceInAllFilesAsString(java.util.List<File>[] replaced) {
+    StringBuilder sb = new StringBuilder();
     java.util.List<File> appliedFiles = replaced[0];
     java.util.List<File> unappliedFiles = replaced[1];
     java.util.List<File> errorFiles = replaced[2];
 
-    PrinterHelper.println("Applied files");
-    PrinterHelper.println(StringHelper.newline + "\t" + StringHelper.splitBy(StringHelper.newline + "\t", appliedFiles));
-    PrinterHelper.println("Total Applied Files: " + appliedFiles.size());
+    sb.append("Applied files");
+    sb.append(StringHelper.newline);
+    sb.append("\t").append(StringHelper.splitBy(StringHelper.newline + "\t", appliedFiles));
+    sb.append("Total Applied Files: ").append(appliedFiles.size());
 
-    PrinterHelper.println();
+    sb.append(StringHelper.newline);
 
-    PrinterHelper.println("Unapplied files");
-    PrinterHelper.println(StringHelper.newline + "\t" + StringHelper.splitBy(StringHelper.newline + "\t", unappliedFiles));
-    PrinterHelper.println("Total Unapplied Files: " + unappliedFiles.size());
+    sb.append("Unapplied files");
+    sb.append(StringHelper.newline);
+    sb.append("\t").append(StringHelper.splitBy(StringHelper.newline + "\t", unappliedFiles));
+    sb.append("Total Unapplied Files: ").append(unappliedFiles.size());
 
-    PrinterHelper.println();
+    sb.append(StringHelper.newline);
 
-    PrinterHelper.println("Error files");
-    PrinterHelper.println(StringHelper.newline + "\t" + StringHelper.splitBy(StringHelper.newline + "\t", errorFiles));
-    PrinterHelper.println("Total Error Files: " + errorFiles.size());
+    sb.append("Error files");
+    sb.append(StringHelper.newline);
+    sb.append("\t").append(StringHelper.splitBy(StringHelper.newline + "\t", errorFiles));
+    sb.append("Total Error Files: ").append(errorFiles.size());
 
-    PrinterHelper.println();
+    sb.append(StringHelper.newline);
 
-    PrinterHelper.println("Total files: " + (appliedFiles.size() + unappliedFiles.size() + errorFiles.size()));
+    sb.append("Total files: ").append(appliedFiles.size() + unappliedFiles.size() + errorFiles.size());
+    return sb.toString();
+  }
+
+  /**
+   * Prints the given list array of files. It's pretty much only useful for the return on the replaceInAllFiles method.
+   * NOTE: Uses PrinterHelper
+   *
+   * @param replaced
+   * @see replaceInAllFiles()
+   * @see getReplaceInAllFilesAsString()
+   */
+  public static void sendReplaceInAllFilesToPrinter(java.util.List<File>[] replaced) {
+    PrinterHelper.println(getReplaceInAllFilesAsString(replaced));
   }
   //</editor-fold>
 
