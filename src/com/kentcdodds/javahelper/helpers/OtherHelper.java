@@ -1,7 +1,6 @@
 package com.kentcdodds.javahelper.helpers;
 
 import java.io.Console;
-import java.io.File;
 import java.util.Scanner;
 
 /**
