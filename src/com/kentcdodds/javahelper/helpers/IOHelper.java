@@ -523,7 +523,7 @@ public class IOHelper {
 
     PrinterHelper.println();
 
-    PrinterHelper.println("Total files" + (appliedFiles.size() + unappliedFiles.size() + errorFiles.size()));
+    PrinterHelper.println("Total files: " + (appliedFiles.size() + unappliedFiles.size() + errorFiles.size()));
   }
   //</editor-fold>
 
