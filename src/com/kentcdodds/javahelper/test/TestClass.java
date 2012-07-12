@@ -1,12 +1,10 @@
 package com.kentcdodds.javahelper.test;
 
-import com.kentcdodds.javahelper.helpers.IOHelper;
-import com.kentcdodds.javahelper.helpers.OtherHelper;
-import com.kentcdodds.javahelper.helpers.PrinterHelper;
-import com.kentcdodds.javahelper.helpers.SwingHelper;
+import com.kentcdodds.javahelper.helpers.*;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.TreeMap;
@@ -33,12 +31,6 @@ public class TestClass {
 
   public static void main(String[] args) throws Exception {
     setStuff();
-    String fileToString = IOHelper.fileToString(ioPlaygroundDir.getPath() + "\\zipMeTest1.txt");
-    System.out.println(fileToString);
-//    TestArchive.email();
-//    OtherHelper.scrambleString("Brooke is great!");
-//    TestArchive.email();
-//    System.out.println(System .getProperty("os.name"));
     System.exit(0);
   }
 

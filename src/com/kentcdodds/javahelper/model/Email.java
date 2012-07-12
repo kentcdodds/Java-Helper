@@ -1,11 +1,10 @@
 package com.kentcdodds.javahelper.model;
 
+import com.kentcdodds.javahelper.helpers.StringHelper;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeBodyPart;
 
@@ -150,11 +149,108 @@ public class Email {
   }
 
   /**
-   * Adds the given address(s) to the replyTo list
+   * Returns information about the email object.
+   *
+   * @return
+   */
+  public String getEmailInString() {
+    String shortenedBody = StringHelper.shortenString(body, 75, .5);
+    String indentedBody = "\t" + shortenedBody.replace(StringHelper.newline, StringHelper.newline + "\t");
+    String bodyLine = "(Shortened) Body (html >>> " + html + "):" + StringHelper.newline + indentedBody;
+
+    StringBuilder bodyPartBuilder = new StringBuilder("bodyParts:");
+    for (MimeBodyPart mimeBodyPart : bodyParts) {
+      bodyPartBuilder.append(StringHelper.newline).append("\t");
+      try {
+        bodyPartBuilder.append(mimeBodyPart.getFileName());
+      } catch (MessagingException ex) {
+        bodyPartBuilder.append("N/A");
+      }
+    }
+    return StringHelper.splitBy(StringHelper.newline,
+            "from: " + from,
+            "replyTo: " + StringHelper.splitBy(", ", replyTo),
+            "to: " + StringHelper.splitBy(", ", to),
+            "cc: " + StringHelper.splitBy(", ", cc),
+            "bcc: " + StringHelper.splitBy(", ", bcc),
+            "subject: " + subject,
+            bodyLine,
+            bodyPartBuilder.toString());
+  }
+
+  //<editor-fold defaultstate="collapsed" desc="Add participants">
+  /**
+   * Adds the given address(es) to the to list
+   *
+   * @param address
+   */
+  public void addTo(String... address) {
+    to.addAll(java.util.Arrays.asList(address));
+  }
+
+  /**
+   * Adds the given address(es) to the cc list
+   *
+   * @param address
+   */
+  public void addCc(String... address) {
+    cc.addAll(java.util.Arrays.asList(address));
+  }
+
+  /**
+   * Adds the given address(es) to the bcc list
+   *
+   * @param address
+   */
+  public void addBcc(String... address) {
+    bcc.addAll(java.util.Arrays.asList(address));
+  }
+
+  /**
+   * Adds the given address(es) to the replyTo list
+   *
+   * @param address
    */
   public void addReplyTo(String... address) {
     replyTo.addAll(java.util.Arrays.asList(address));
   }
+
+  /**
+   * Adds the given address(es) to the to list
+   *
+   * @param addresses
+   */
+  public void addTo(List<String> addresses) {
+    to.addAll(addresses);
+  }
+
+  /**
+   * Adds the given address(es) to the cc list
+   *
+   * @param address
+   */
+  public void addCc(List<String> addresses) {
+    cc.addAll(addresses);
+  }
+
+  /**
+   * Adds the given address(es) to the bcc list
+   *
+   * @param address
+   */
+  public void addBcc(List<String> addresses) {
+    bcc.addAll(addresses);
+  }
+
+  /**
+   * Adds the given address(es) to the replyTo list
+   *
+   * @param address
+   */
+  public void addReplyTo(List<String> addresses) {
+    replyTo.addAll(addresses);
+  }
+  //</editor-fold>
 
   //<editor-fold defaultstate="collapsed" desc="Getters and Setters">
   /**

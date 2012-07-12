@@ -256,7 +256,7 @@ public class TestArchive {
     String subject = "This is a test subject!" + new Random().nextInt(1000);
     String body = "<div>This is text before</div><img src=\"cid:" + contentId + "\" alt=\"Inline image 1\" width=\"150\"><div><br></div><div>This is after</div>";
     Email email = new Email(from, to, cc, bcc, subject, body);
-    email.setHtml(true);
+    email.setHtml(false);
     EmailAttachment attachment1 = new EmailAttachment();
 //    attachment1.setFile(new File("C:\\Users\\kentcdodds\\Documents\\test attachment.txt"));
 //    attachment1.setFile(new File("C:\\Users\\kentcdodds\\Downloads\\smileyfacerd1.jpg"));
